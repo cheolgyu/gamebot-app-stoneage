@@ -1,22 +1,24 @@
 package com.example.myapplication.service
 
-import android.app.*
+import android.app.ActivityManager
+import android.app.ActivityManager.RunningAppProcessInfo
+import android.app.AlertDialog
+import android.app.Service
 import android.content.Context
+import android.content.DialogInterface
 import android.content.Intent
 import android.media.projection.MediaProjectionManager
 import android.os.*
-import android.os.Process.THREAD_PRIORITY_BACKGROUND
-import android.view.LayoutInflater
-import android.widget.Toast
-import android.os.Process
 import android.util.Log
+import android.view.MotionEvent
+import android.widget.Toast
 import androidx.core.app.ActivityCompat.startActivityForResult
-import androidx.core.app.NotificationCompat
-import androidx.core.app.NotificationManagerCompat
 import com.example.myapplication.MediaProjectionActivity
-import com.example.myapplication.MediaProjectionDemo
-import com.example.myapplication.R
+import com.example.myapplication.ShellExecuter
 import com.example.myapplication.notification.Noti
+import java.io.BufferedReader
+import java.io.InputStreamReader
+
 
 class BackgroundService : Service() {
 
@@ -25,7 +27,7 @@ class BackgroundService : Service() {
             Intent(context, BackgroundService::class.java)
     }
 
-    private  val FOREGROUND_SERVICE_ID = 1000
+    private val FOREGROUND_SERVICE_ID = 1000
     private var serviceLooper: Looper? = null
     private var serviceHandler: ServiceHandler? = null
     val TAG: String = "BackgroundService"
@@ -38,7 +40,12 @@ class BackgroundService : Service() {
             // Normally we would do some work here, like download a file.
             // For our sample, we just sleep for 5 seconds.
             try {
-                Thread.sleep(5000)
+                var shell: ShellExecuter = ShellExecuter()
+                // touch : input tap x y
+                var res = shell.Executer("input tap 8 433")
+
+                Log.d(TAG, "res=====================================" + res.toString())
+                Thread.sleep(500)
             } catch (e: InterruptedException) {
                 // Restore interrupt status.
                 Thread.currentThread().interrupt()
@@ -50,15 +57,17 @@ class BackgroundService : Service() {
         }
     }
 
-    fun my_notify(){
+
+    fun my_notify() {
         var noti = Noti(this)
         noti!!.createNotificationChannel()
         var notify = noti!!.build(11232131);
         startForeground(FOREGROUND_SERVICE_ID, notify)
     }
 
-    fun my_media(){
-        mediaProjectionManager = getSystemService(Context.MEDIA_PROJECTION_SERVICE) as MediaProjectionManager
+    fun my_media() {
+        mediaProjectionManager =
+            getSystemService(Context.MEDIA_PROJECTION_SERVICE) as MediaProjectionManager
         //startActivityForResult(mediaProjectionManager!!.createScreenCaptureIntent(), this)
         startActivity(MediaProjectionActivity.newInstance(this))
     }
@@ -70,7 +79,10 @@ class BackgroundService : Service() {
         // background priority so CPU-intensive work will not disrupt our UI.
         Log.d(TAG, "onCreate=====================================")
         my_notify()
-        my_media()
+        //my_media()
+        // my_click(this);
+        //getRunActivity();
+
 
         HandlerThread("ServiceStartArguments", Process.THREAD_PRIORITY_BACKGROUND).apply {
             start()
@@ -84,7 +96,7 @@ class BackgroundService : Service() {
     }
 
     override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
-        Log.d("backend","빌드 -onStartCommand")
+        Log.d("backend", "빌드 -onStartCommand")
 
         Toast.makeText(this, "service starting~~~~~~~``", Toast.LENGTH_SHORT).show()
         // For each start request, send a message to start a job and deliver the
