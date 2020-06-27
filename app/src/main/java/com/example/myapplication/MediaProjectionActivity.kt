@@ -2,6 +2,7 @@ package com.example.myapplication
 
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.app.ActivityManager
 import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
@@ -17,9 +18,11 @@ import android.media.projection.MediaProjection
 import android.media.projection.MediaProjectionManager
 import android.os.Bundle
 import android.os.Handler
+import android.os.SystemClock
 import android.util.DisplayMetrics
 import android.util.Log
 import android.view.Display
+import android.view.MotionEvent
 import android.view.OrientationEventListener
 import androidx.activity.result.contract.ActivityResultContract
 import androidx.appcompat.app.AppCompatActivity
@@ -62,13 +65,16 @@ class MediaProjectionActivity : AppCompatActivity() {
         Log.d(TAG, "MediaProjectionActivity=====================================")
 
 
+        // 캡처 주석
+      //  mediaProjectionManager =
+       //     getSystemService(Context.MEDIA_PROJECTION_SERVICE) as MediaProjectionManager
+      //  startActivityForResult(mediaProjectionManager!!.createScreenCaptureIntent(), 1234)
 
-        mediaProjectionManager =
-            getSystemService(Context.MEDIA_PROJECTION_SERVICE) as MediaProjectionManager
-        startActivityForResult(mediaProjectionManager!!.createScreenCaptureIntent(), 1234)
 
 
     }
+
+
 
 
     internal class MediaProjectionResultContract : ActivityResultContract<Intent, Intent>() {
