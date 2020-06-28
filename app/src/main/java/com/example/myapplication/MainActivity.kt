@@ -96,31 +96,13 @@ class MainActivity : AppCompatActivity()  , View.OnClickListener{
                 "Button4 Clicked!", Toast.LENGTH_SHORT
             ).show()
         }
-    fun model_test(){
-        Log.d("TAG", "res=====================================model_test" )
-        var run = Run(this)
-        run.build()
-        run.detectionResultsShouldNotChange()
-    }
 
     fun move(view: View?) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-           // startForegroundService(BackgroundService.newService(this))
+            startForegroundService(BackgroundService.newService(this))
         } else {
             Log.e("sdfafasd","버전맞춰!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
         }
-        model_test()
-
-
-      //  val intent = Intent(this, MediaProjectionActivity::class.java)
-      //  startActivity(intent);
-//        Intent(this, BackgroundService::class.java).also { intent ->
-//            startService(intent)
-//        }
     }
 
-    fun test(){
-
-
-    }
 }

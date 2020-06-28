@@ -46,7 +46,7 @@ class BackgroundService : Service() {
              //   var res = shell.Executer("input tap 8 433")
 
              //   Log.d(TAG, "res=====================================" + res.toString())
-               // model_test()
+                model_test()
 
 
                 Thread.sleep(500)
