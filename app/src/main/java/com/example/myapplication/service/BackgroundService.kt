@@ -7,16 +7,18 @@ import android.media.projection.MediaProjectionManager
 import android.os.*
 import android.util.Log
 import android.widget.Toast
+import androidx.core.app.ActivityCompat.startActivityForResult
 import com.example.myapplication.MediaProjectionActivity
 import com.example.myapplication.ShellExecuter
 import com.example.myapplication.notification.Noti
 import com.example.myapplication.tflite.Run
+import java.io.File
 
 
 class BackgroundService : Service() {
     companion object {
-        val ACTION_START_FOREGROUND_SERVICE: String= "ACTION_START_FOREGROUND_SERVICE"
-        val ACTION_STOP_FOREGROUND_SERVICE: String= "ACTION_STOP_FOREGROUND_SERVICE"
+        var STORE_DIRECTORY: String? = null
+        var RUN_IMG: String? = null
         var Run = false
         val TAG: String = "BackgroundService"
         private val FOREGROUND_SERVICE_ID = 1000
@@ -49,54 +51,67 @@ class BackgroundService : Service() {
             // Normally we would do some work here, like download a file.
             // For our sample, we just sleep for 5 seconds.
             try {
+                var i =0
                 while (true){
-                    Log.d(TAG, "" + msg.toString())
-                    Log.d(TAG, "" + msg.arg1+","+msg.arg2)
+                    val externalFilesDir: File? = getExternalFilesDir(null)
+                    if (externalFilesDir != null) {
+                        STORE_DIRECTORY = externalFilesDir.toString() + "/screencap/"
+                        val storeDirectory = File(STORE_DIRECTORY)
+                        if (!storeDirectory.exists()) {
+                            val success: Boolean = storeDirectory.mkdirs()
+                            if (!success) {
+                                Log.e(TAG, "failed to create file storage directory.")
+                                return
+                            }
+                        }
+                    }
+                    RUN_IMG = STORE_DIRECTORY+"test.png"
+                    var cmd = "screencap -p $RUN_IMG"
+                    Log.e(TAG, "cmd:" + cmd)
+                    var capture = ShellExecuter().Executer(cmd)
+                    Log.e(TAG, "sh_out=====================================" + capture.toString())
+                    var rr1 = ShellExecuter().Executer("cd "+STORE_DIRECTORY)
+                    Log.e(TAG, "sh_out=====================================" + rr1.toString())
+                    var rr = ShellExecuter().Executer("ls -al")
+                    Log.e(TAG, "sh_out=====================================" + rr.toString())
+                    Thread.sleep(500)
+                    var arr :FloatArray? =model_test()
+                    model_test().let {
+
+                        var cmd :String = "input tap "+String.format("%.1f", it?.get(0))+" "+String.format("%.1f", it?.get(1))
+                        //37 은 application에서 터치 이벤트 못받음 .....
+                        var cmd2 = "input tap 489.9 37.7"
+                        Log.d(TAG, "adb -e shell " + cmd)
+                        var sh_out= ShellExecuter().Executer(cmd)
+                        Log.d(TAG, "sh_out=====================================" + sh_out.toString())
+                    }
+
+                    i= i+1
                     Thread.sleep(500)
                 }
              //   Log.d(TAG, "res=====================================" + res.toString())
-                var arr :FloatArray? =model_test()
-                model_test().let {
 
-                    var cmd :String = "input tap "+String.format("%.1f", it?.get(0))+" "+String.format("%.1f", it?.get(1))
-                    //37 은 application에서 터치 이벤트 못받음 .....
-                    var cmd2 = "input tap 489.9 37.7"
-                    Log.d(TAG, "adb -e shell " + cmd.toString())
-                    var sh_out= ShellExecuter().Executer(cmd)
-                    Log.d(TAG, "sh_out=====================================" + sh_out.toString())
-                }
 
                 Thread.sleep(500000)
             } catch (e: InterruptedException) {
-                // Restore interrupt status.
                 Thread.currentThread().interrupt()
             }
 
-            // Stop the service using the startId, so that we don't stop
-            // the service in the middle of handling another job
             stopSelf(msg.arg1)
         }
     }
 
     override fun onCreate() {
-        // Start up the thread running the service.  Note that we create a
-        // separate thread because the service normally runs in the process's
-        // main thread, which we don't want to block.  We also make it
-        // background priority so CPU-intensive work will not disrupt our UI.
+
         Log.d(TAG, "onCreate====================================="+Run)
 
         my_notify()
         //my_media()
-        // my_click(this);
-        //getRunActivity();
-
 
         handlerThread = HandlerThread("서비스핸들러", Process.THREAD_PRIORITY_BACKGROUND)
         handlerThread!!.start()
         serviceLooper = handlerThread!!.looper
         serviceHandler = ServiceHandler(handlerThread!!.looper)
-
-
 
     }
 
@@ -105,8 +120,7 @@ class BackgroundService : Service() {
         var arg2 = 0
         var jobId =0
         if(Run){
-            startForegroundService()
-             arg2 = 1
+            arg2 = 1
             jobId =1
             serviceHandler?.obtainMessage()?.also { msg ->
                 msg.arg1 = jobId
@@ -133,7 +147,7 @@ class BackgroundService : Service() {
         Log.d(TAG, "res=====================================model_test" )
         var run = Run(this)
         run.build()
-        return run.get_xy()
+        return run.get_xy(RUN_IMG!!)
     }
 
 
@@ -160,17 +174,6 @@ class BackgroundService : Service() {
         Log.d("", "onDestroy")
         Run = false
         //Toast.makeText(this, "service done", Toast.LENGTH_SHORT).show()
-    }
-
-
-    private fun startForegroundService() {
-        Log.d("", "start foreground service.")
-
-        // Stop foreground service and remove the notification.
-        //stopForeground(true)
-
-        // Stop the foreground service.
-        //stopSelf()
     }
 
      fun stopForegroundService() {

@@ -13,11 +13,8 @@ class ShellExecuter {
         var  p: Process? =null
         var str :StringBuilder =  StringBuilder()
         try {
-            Log.d("ShellExecuter", "11")
             p = Runtime.getRuntime().exec(command)
-            Log.d("ShellExecuter", "12")
             p.waitFor()
-            Log.d("ShellExecuter", "13")
             var reader: BufferedReader  = BufferedReader( InputStreamReader(p.getInputStream()))
 
             while (true) {

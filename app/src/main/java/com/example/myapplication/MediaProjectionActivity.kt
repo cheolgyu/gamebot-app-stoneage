@@ -66,9 +66,9 @@ class MediaProjectionActivity : AppCompatActivity() {
 
 
         // 캡처 주석
-      //  mediaProjectionManager =
-       //     getSystemService(Context.MEDIA_PROJECTION_SERVICE) as MediaProjectionManager
-      //  startActivityForResult(mediaProjectionManager!!.createScreenCaptureIntent(), 1234)
+        mediaProjectionManager =
+           getSystemService(Context.MEDIA_PROJECTION_SERVICE) as MediaProjectionManager
+        startActivityForResult(mediaProjectionManager!!.createScreenCaptureIntent(), 1234)
 
 
 
@@ -217,7 +217,7 @@ class MediaProjectionActivity : AppCompatActivity() {
                         FileOutputStream(STORE_DIRECTORY.toString() +ts+ ".JPEG")
                     bitmap.compress(CompressFormat.JPEG, 100, fos)
                     IMAGES_PRODUCED++
-                    Log.e(TAG, "captured image: $IMAGES_PRODUCED")
+                    Log.e(TAG, "captured image: $STORE_DIRECTORY$IMAGES_PRODUCED")
                 }
             } catch (e: Exception) {
                 e.printStackTrace()
