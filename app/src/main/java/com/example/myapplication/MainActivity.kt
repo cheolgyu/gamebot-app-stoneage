@@ -13,6 +13,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import com.example.myapplication.service.BackgroundService
+import com.example.myapplication.tflite.Run
 import com.example.myapplication.worker.StartWorker
 import com.example.myapplication.worker.StopWorker
 
@@ -46,26 +47,6 @@ class MainActivity : AppCompatActivity()  , View.OnClickListener{
                 applicationContext,
                 "4444444444444444444", Toast.LENGTH_SHORT
             ).show()
-            val downTime = SystemClock.uptimeMillis()
-            val eventTime = SystemClock.uptimeMillis() + 100
-            val x = 0.0f
-            val y = 0.0f
-// List of meta states found here:     developer.android.com/reference/android/view/KeyEvent.html#getMetaState()
-// List of meta states found here:     developer.android.com/reference/android/view/KeyEvent.html#getMetaState()
-            val metaState = 0
-            val motionEvent = MotionEvent.obtain(
-                downTime,
-                eventTime,
-                MotionEvent.ACTION_UP,
-                x,
-                y,
-                metaState
-            )
-
-// Dispatch touch event to view
-
-// Dispatch touch event to view
-            this.dispatchTouchEvent(motionEvent)
         }
 
     }
@@ -115,18 +96,31 @@ class MainActivity : AppCompatActivity()  , View.OnClickListener{
                 "Button4 Clicked!", Toast.LENGTH_SHORT
             ).show()
         }
+    fun model_test(){
+        Log.d("TAG", "res=====================================model_test" )
+        var run = Run(this)
+        run.build()
+        run.detectionResultsShouldNotChange()
+    }
 
     fun move(view: View?) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            startForegroundService(BackgroundService.newService(this))
+           // startForegroundService(BackgroundService.newService(this))
         } else {
             Log.e("sdfafasd","버전맞춰!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
         }
+        model_test()
+
 
       //  val intent = Intent(this, MediaProjectionActivity::class.java)
       //  startActivity(intent);
 //        Intent(this, BackgroundService::class.java).also { intent ->
 //            startService(intent)
 //        }
+    }
+
+    fun test(){
+
+
     }
 }
