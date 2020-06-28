@@ -16,6 +16,7 @@ import androidx.core.app.ActivityCompat.startActivityForResult
 import com.example.myapplication.MediaProjectionActivity
 import com.example.myapplication.ShellExecuter
 import com.example.myapplication.notification.Noti
+import com.example.myapplication.tflite.Run
 import java.io.BufferedReader
 import java.io.InputStreamReader
 
@@ -40,11 +41,14 @@ class BackgroundService : Service() {
             // Normally we would do some work here, like download a file.
             // For our sample, we just sleep for 5 seconds.
             try {
-                var shell: ShellExecuter = ShellExecuter()
+              //  var shell: ShellExecuter = ShellExecuter()
                 // touch : input tap x y
-                var res = shell.Executer("input tap 8 433")
+             //   var res = shell.Executer("input tap 8 433")
 
-                Log.d(TAG, "res=====================================" + res.toString())
+             //   Log.d(TAG, "res=====================================" + res.toString())
+               // model_test()
+
+
                 Thread.sleep(500)
             } catch (e: InterruptedException) {
                 // Restore interrupt status.
@@ -55,6 +59,13 @@ class BackgroundService : Service() {
             // the service in the middle of handling another job
             stopSelf(msg.arg1)
         }
+    }
+
+    fun model_test(){
+        Log.d(TAG, "res=====================================model_test" )
+        var run = Run(this)
+        run.build()
+        run.detectionResultsShouldNotChange()
     }
 
 
