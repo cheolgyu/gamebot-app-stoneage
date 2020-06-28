@@ -58,9 +58,8 @@ class MainActivity : AppCompatActivity()  , View.OnClickListener{
                 val x = event.getX()
                 val y = event.getY()
 
-                val msg = "터치를 입력받음 : " +x+" / " +y
-
-                Toast. makeText(applicationContext, msg, Toast.LENGTH_SHORT ).show();
+            Log.d("터치를 입력받음 ",x.toString()+" / " +y)
+                //Toast. makeText(applicationContext, msg, Toast.LENGTH_SHORT ).show();
                 return true;
         }
 

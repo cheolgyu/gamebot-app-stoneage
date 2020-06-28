@@ -41,15 +41,23 @@ class BackgroundService : Service() {
             // Normally we would do some work here, like download a file.
             // For our sample, we just sleep for 5 seconds.
             try {
-              //  var shell: ShellExecuter = ShellExecuter()
+
                 // touch : input tap x y
              //   var res = shell.Executer("input tap 8 433")
 
              //   Log.d(TAG, "res=====================================" + res.toString())
-                model_test()
+                var arr :FloatArray? =model_test()
+                model_test().let {
 
+                    var cmd :String = "input tap "+String.format("%.1f", it?.get(0))+" "+String.format("%.1f", it?.get(1))
+                    //37 은 application에서 터치 이벤트 못받음 .....
+                    var cmd2 = "input tap 489.9 37.7"
+                    Log.d(TAG, "adb -e shell " + cmd.toString())
+                    var sh_out= ShellExecuter().Executer(cmd)
+                    Log.d(TAG, "sh_out=====================================" + sh_out.toString())
+                }
 
-                Thread.sleep(500)
+               // Thread.sleep(50000)
             } catch (e: InterruptedException) {
                 // Restore interrupt status.
                 Thread.currentThread().interrupt()
@@ -61,11 +69,11 @@ class BackgroundService : Service() {
         }
     }
 
-    fun model_test(){
+    fun model_test(): FloatArray? {
         Log.d(TAG, "res=====================================model_test" )
         var run = Run(this)
         run.build()
-        run.detectionResultsShouldNotChange()
+        return run.get_xy()
     }
 
 
