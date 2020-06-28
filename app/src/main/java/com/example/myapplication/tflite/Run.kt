@@ -11,9 +11,9 @@ import java.util.*
 
 class Run(_context: Context) {
     private val MODEL_INPUT_SIZE = 300
-    private val IS_MODEL_QUANTIZED = true
-    private val MODEL_FILE = "detect.tflite"
-    private val LABELS_FILE = "file:///android_asset/labelmap.txt"
+    private val IS_MODEL_QUANTIZED = false
+    private val MODEL_FILE = "test/detect_copy2.tflite"
+    private val LABELS_FILE = "file:///android_asset/test/labelmap.txt"
     private val IMAGE_SIZE = Size(640, 480)
 
     private var detector: Classifier? = null
@@ -54,9 +54,9 @@ class Run(_context: Context) {
 
 
     @Throws(java.lang.Exception::class)
-    fun detectionResultsShouldNotChange() {
+    fun get_xy(): FloatArray? {
         val canvas = Canvas(croppedBitmap!!)
-        loadImage("table.jpg")?.let {
+        loadImage("test.jpg")?.let {
             canvas.drawBitmap(
                 it,
                 frameToCropTransform!!,
@@ -64,46 +64,24 @@ class Run(_context: Context) {
             )
         }
         val results: List<Classifier.Recognition?>? = detector!!.recognizeImage(croppedBitmap)
-        for (item in results!!) {
-
-        }
-
-        val expected: List<Classifier.Recognition> =
-            loadRecognitions("table_results.txt")
-        for (target in expected) {
-            // Find a matching result in results
-            var matched = false
-            for (item in results!!) {
-                val bbox = RectF()
-                if (item != null) {
-                    cropToFrameTransform!!.mapRect(bbox, item.getLocation())
-                    var title = item.getTitle().equals(target.getTitle())
-                    var box = matchBoundingBoxes(
-                        bbox,
-                        target.getLocation()
-                    )
-                    var confidence = item.getConfidence()?.let {
-                        target.getConfidence()?.let { it1 ->
-                            matchConfidence(
-                                it,
-                                it1
-                            )
-                        }
-                    }
-                    if (title
-                        && box
-                        && confidence!!
-                    ) {
-                        matched = true
-                        break
-                    }
-                }
-
-            }
-            if (matched ){
-                Log.d("성공","==============")
+//        for (item in results!!) {
+//            Log.d("모델결과",item.toString())
+//        }
+        var f_arr = FloatArray(2)
+        if (results!!.isNotEmpty()){
+            var max_item = results[0]
+            var x = max_item?.getLocation()?.centerX()
+            var y = max_item?.getLocation()?.centerY()
+            if (x != null && y != null) {
+                f_arr.set(0,x)
+                f_arr.set(1,y)
+                Log.d("모델결과-max_item ",max_item.toString())
+                Log.d("모델결과-x,y ",x.toString())
+                Log.d("모델결과-x,y ",y.toString())
+                return f_arr
             }
         }
+        return null
     }
 
     // Confidence tolerance: absolute 1%

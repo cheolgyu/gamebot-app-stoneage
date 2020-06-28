@@ -19,7 +19,7 @@ import java.util.*
 
 
 class TFLiteObjectDetectionAPIModel public constructor() : Classifier {
-    private var isModelQuantized = true
+    private var isModelQuantized = false
 
     // Config values.
     private var inputSize = 0
@@ -173,6 +173,7 @@ class TFLiteObjectDetectionAPIModel public constructor() : Classifier {
 
         // Only return this many results.
         private const val NUM_DETECTIONS = 10
+       // private const val NUM_DETECTIONS = 1
 
         // Float model
         private const val IMAGE_MEAN = 127.5f
