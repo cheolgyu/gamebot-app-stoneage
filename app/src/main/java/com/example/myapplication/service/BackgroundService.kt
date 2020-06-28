@@ -18,6 +18,14 @@ class BackgroundService : Service() {
         val ACTION_START_FOREGROUND_SERVICE: String= "ACTION_START_FOREGROUND_SERVICE"
         val ACTION_STOP_FOREGROUND_SERVICE: String= "ACTION_STOP_FOREGROUND_SERVICE"
         var Run = false
+        val TAG: String = "BackgroundService"
+        private val FOREGROUND_SERVICE_ID = 1000
+        private var serviceLooper: Looper? = null
+        private var serviceHandler: ServiceHandler? = null
+
+        private var handlerThread: HandlerThread? = null
+        var mediaProjectionManager: MediaProjectionManager? = null
+
         fun newService(context: Context,action :String ): Intent =
             Intent(context, BackgroundService::class.java).apply {
                 Run = true
@@ -27,20 +35,25 @@ class BackgroundService : Service() {
             }
     }
 
-    private val FOREGROUND_SERVICE_ID = 1000
-    private var serviceLooper: Looper? = null
-    private var serviceHandler: ServiceHandler? = null
-    val TAG: String = "BackgroundService"
-    var mediaProjectionManager: MediaProjectionManager? = null
+
 
     // Handler that receives messages from the thread
     private inner class ServiceHandler(looper: Looper) : Handler(looper) {
 
         override fun handleMessage(msg: Message) {
+            if(msg.arg2 == 0){
+                stopSelf(msg.arg1)
+            }
+            Log.d(TAG, "handleMessage" + msg.toString())
+            Log.d(TAG, "handleMessage " + msg.arg2)
             // Normally we would do some work here, like download a file.
             // For our sample, we just sleep for 5 seconds.
             try {
-
+                while (true){
+                    Log.d(TAG, "" + msg.toString())
+                    Log.d(TAG, "" + msg.arg1+","+msg.arg2)
+                    Thread.sleep(500)
+                }
              //   Log.d(TAG, "res=====================================" + res.toString())
                 var arr :FloatArray? =model_test()
                 model_test().let {
@@ -53,7 +66,7 @@ class BackgroundService : Service() {
                     Log.d(TAG, "sh_out=====================================" + sh_out.toString())
                 }
 
-                Thread.sleep(50000)
+                Thread.sleep(500000)
             } catch (e: InterruptedException) {
                 // Restore interrupt status.
                 Thread.currentThread().interrupt()
@@ -63,6 +76,57 @@ class BackgroundService : Service() {
             // the service in the middle of handling another job
             stopSelf(msg.arg1)
         }
+    }
+
+    override fun onCreate() {
+        // Start up the thread running the service.  Note that we create a
+        // separate thread because the service normally runs in the process's
+        // main thread, which we don't want to block.  We also make it
+        // background priority so CPU-intensive work will not disrupt our UI.
+        Log.d(TAG, "onCreate====================================="+Run)
+
+        my_notify()
+        //my_media()
+        // my_click(this);
+        //getRunActivity();
+
+
+        handlerThread = HandlerThread("서비스핸들러", Process.THREAD_PRIORITY_BACKGROUND)
+        handlerThread!!.start()
+        serviceLooper = handlerThread!!.looper
+        serviceHandler = ServiceHandler(handlerThread!!.looper)
+
+
+
+    }
+
+    override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
+        Log.d("backend", "빌드 -onStartCommand------------"+Run)
+        var arg2 = 0
+        var jobId =0
+        if(Run){
+            startForegroundService()
+             arg2 = 1
+            jobId =1
+            serviceHandler?.obtainMessage()?.also { msg ->
+                msg.arg1 = jobId
+                msg.arg2 = arg2
+                serviceHandler?.sendMessage(msg)
+            }
+            Toast.makeText(this, "service starting~~~~~~~``", Toast.LENGTH_SHORT).show()
+        }else{
+            serviceHandler?.removeMessages(0)
+            handlerThread!!.interrupt()
+            handlerThread!!.quit()
+            stopForegroundService()
+        }
+
+
+
+
+
+        // If we get killed, after returning from here, restart
+        return START_STICKY
     }
 
     fun model_test(): FloatArray? {
@@ -87,50 +151,6 @@ class BackgroundService : Service() {
         startActivity(MediaProjectionActivity.newInstance(this))
     }
 
-    override fun onCreate() {
-        // Start up the thread running the service.  Note that we create a
-        // separate thread because the service normally runs in the process's
-        // main thread, which we don't want to block.  We also make it
-        // background priority so CPU-intensive work will not disrupt our UI.
-        Log.d(TAG, "onCreate====================================="+Run)
-
-        my_notify()
-        //my_media()
-        // my_click(this);
-        //getRunActivity();
-
-
-        HandlerThread("ServiceStartArguments", Process.THREAD_PRIORITY_BACKGROUND).apply {
-            start()
-
-            // Get the HandlerThread's Looper and use it for our Handler
-            serviceLooper = looper
-            serviceHandler = ServiceHandler(looper)
-        }
-
-
-    }
-
-    override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
-        Log.d("backend", "빌드 -onStartCommand-"+Run)
-        if(Run){
-            startForegroundService()
-        }else{
-            stopForegroundService()
-        }
-
-
-        Toast.makeText(this, "service starting~~~~~~~``", Toast.LENGTH_SHORT).show()
-        // For each start request, send a message to start a job and deliver the
-        // start ID so we know which request we're stopping when we finish the job
-        serviceHandler?.obtainMessage()?.also { msg ->
-            msg.arg1 = startId
-            serviceHandler?.sendMessage(msg)
-        }
-        // If we get killed, after returning from here, restart
-        return START_STICKY
-    }
-
     override fun onBind(intent: Intent): IBinder? {
         // We don't provide binding, so return null
         return null
@@ -147,10 +167,10 @@ class BackgroundService : Service() {
         Log.d("", "start foreground service.")
 
         // Stop foreground service and remove the notification.
-       // stopForeground(true)
+        //stopForeground(true)
 
         // Stop the foreground service.
-        ///stopSelf()
+        //stopSelf()
     }
 
      fun stopForegroundService() {

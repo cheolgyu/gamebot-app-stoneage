@@ -21,8 +21,7 @@ class MainActivity : AppCompatActivity()  , View.OnClickListener{
     override fun onCreate(savedInstanceState: Bundle?) {
         val action = intent.extras?.getString("action")
         if ( action!=null && action =="stop" ){
-            Log.d("action",action)
-            startForegroundService(BackgroundService.newService(this,action))
+            service_action(action)
         }
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -100,12 +99,26 @@ class MainActivity : AppCompatActivity()  , View.OnClickListener{
             ).show()
         }
 
-    fun move(view: View?) {
+    fun service_start_btn(view: View?) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            startForegroundService(BackgroundService.newService(this,""))
+            service_action("")
         } else {
             Log.e("sdfafasd","버전맞춰!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
         }
+    }
+
+    fun service_stop_btn(view: View?) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            service_action("stop")
+        } else {
+            Log.e("sdfafasd","버전맞춰!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+        }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun service_action(action:String) {
+        Log.d("action",action)
+        startForegroundService(BackgroundService.newService(this,action))
     }
 
 }

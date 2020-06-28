@@ -42,12 +42,7 @@ class Noti(val _context: Context)  {
 
         val notificationIntent = Intent(_context, MainActivity::class.java)
         notificationIntent.putExtra("action","stop")
-        val service_intent = Intent(_context, BackgroundService::class.java)
-        val pendingIntent2 = PendingIntent.getActivity(
-            _context,
-            0, service_intent, 0
-        )
-        service_intent.setAction(BackgroundService.ACTION_STOP_FOREGROUND_SERVICE);
+
         val pendingIntent = PendingIntent.getActivity(
             _context,
             0, notificationIntent, 0
@@ -64,7 +59,7 @@ class Noti(val _context: Context)  {
             .setContentTitle(title)
             .setContentText(text)
             .setContentIntent(pendingIntent)
-            .addAction(R.mipmap.ic_launcher, "정지", pendingIntent2)
+            .addAction(R.mipmap.ic_launcher, "정지", pendingIntent)
             .build()
         return builder
     }
