@@ -60,7 +60,7 @@ class Run(_context: Context) {
     @Throws(java.lang.Exception::class)
     fun get_xy(img: String): FloatArray? {
         val canvas = Canvas(croppedBitmap!!)
-        loadImage2(img)?.let {
+        loadImage(img)?.let {
             canvas.drawBitmap(
                 it,
                 frameToCropTransform!!,
@@ -113,30 +113,6 @@ class Run(_context: Context) {
                 .getAssets()
         val inputStream = assetManager.open(fileName)
         return BitmapFactory.decodeStream(inputStream)
-    }
-
-    @Throws(Exception::class)
-    private fun loadImage2(fileName: String): Bitmap? {
-        val file = File(fileName)
-
-        if (file.canRead()==false){
-            Log.e("파일","못읽는다")
-        }else{
-            Log.e("파일",""+file.path)
-            Log.e("파일",""+file.length())
-            Log.e("파일",""+file.toString())
-        }
-
-        var fis : InputStream
-        var b : Bitmap? = null
-        try {
-            fis  = file.inputStream()
-            b = BitmapFactory.decodeStream(fis)
-        } catch (e: FileNotFoundException) {
-            e.printStackTrace()
-        }
-        //val inputStream = file.inputStream()
-        return b
     }
 
     // The format of result:

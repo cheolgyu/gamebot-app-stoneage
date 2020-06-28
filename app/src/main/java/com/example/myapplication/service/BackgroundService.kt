@@ -17,7 +17,6 @@ import java.io.File
 
 class BackgroundService : Service() {
     companion object {
-        var STORE_DIRECTORY: String? = null
         var RUN_IMG: String? = null
         var Run = false
         val TAG: String = "BackgroundService"
@@ -53,28 +52,7 @@ class BackgroundService : Service() {
             try {
                 var i =0
                 while (true){
-                    val externalFilesDir: File? = getExternalFilesDir(null)
-                    if (externalFilesDir != null) {
-                        STORE_DIRECTORY = externalFilesDir.toString() + "/screencap/"
-                        val storeDirectory = File(STORE_DIRECTORY)
-                        if (!storeDirectory.exists()) {
-                            val success: Boolean = storeDirectory.mkdirs()
-                            if (!success) {
-                                Log.e(TAG, "failed to create file storage directory.")
-                                return
-                            }
-                        }
-                    }
-                    RUN_IMG = STORE_DIRECTORY+"test.png"
-                    var cmd = "screencap -p $RUN_IMG"
-                    Log.e(TAG, "cmd:" + cmd)
-                    var capture = ShellExecuter().Executer(cmd)
-                    Log.e(TAG, "sh_out=====================================" + capture.toString())
-                    var rr1 = ShellExecuter().Executer("cd "+STORE_DIRECTORY)
-                    Log.e(TAG, "sh_out=====================================" + rr1.toString())
-                    var rr = ShellExecuter().Executer("ls -al")
-                    Log.e(TAG, "sh_out=====================================" + rr.toString())
-                    Thread.sleep(500)
+
                     var arr :FloatArray? =model_test()
                     model_test().let {
 
