@@ -1,31 +1,30 @@
 package com.example.myapplication.service
 
-import android.app.ActivityManager
-import android.app.ActivityManager.RunningAppProcessInfo
-import android.app.AlertDialog
 import android.app.Service
 import android.content.Context
-import android.content.DialogInterface
 import android.content.Intent
 import android.media.projection.MediaProjectionManager
 import android.os.*
 import android.util.Log
-import android.view.MotionEvent
 import android.widget.Toast
-import androidx.core.app.ActivityCompat.startActivityForResult
 import com.example.myapplication.MediaProjectionActivity
 import com.example.myapplication.ShellExecuter
 import com.example.myapplication.notification.Noti
 import com.example.myapplication.tflite.Run
-import java.io.BufferedReader
-import java.io.InputStreamReader
 
 
 class BackgroundService : Service() {
-
     companion object {
-        fun newService(context: Context): Intent =
-            Intent(context, BackgroundService::class.java)
+        val ACTION_START_FOREGROUND_SERVICE: String= "ACTION_START_FOREGROUND_SERVICE"
+        val ACTION_STOP_FOREGROUND_SERVICE: String= "ACTION_STOP_FOREGROUND_SERVICE"
+        var Run = false
+        fun newService(context: Context,action :String ): Intent =
+            Intent(context, BackgroundService::class.java).apply {
+                Run = true
+                if (action == "stop"){
+                    Run = false
+                }
+            }
     }
 
     private val FOREGROUND_SERVICE_ID = 1000
@@ -42,9 +41,6 @@ class BackgroundService : Service() {
             // For our sample, we just sleep for 5 seconds.
             try {
 
-                // touch : input tap x y
-             //   var res = shell.Executer("input tap 8 433")
-
              //   Log.d(TAG, "res=====================================" + res.toString())
                 var arr :FloatArray? =model_test()
                 model_test().let {
@@ -57,7 +53,7 @@ class BackgroundService : Service() {
                     Log.d(TAG, "sh_out=====================================" + sh_out.toString())
                 }
 
-               // Thread.sleep(50000)
+                Thread.sleep(50000)
             } catch (e: InterruptedException) {
                 // Restore interrupt status.
                 Thread.currentThread().interrupt()
@@ -96,7 +92,8 @@ class BackgroundService : Service() {
         // separate thread because the service normally runs in the process's
         // main thread, which we don't want to block.  We also make it
         // background priority so CPU-intensive work will not disrupt our UI.
-        Log.d(TAG, "onCreate=====================================")
+        Log.d(TAG, "onCreate====================================="+Run)
+
         my_notify()
         //my_media()
         // my_click(this);
@@ -115,7 +112,13 @@ class BackgroundService : Service() {
     }
 
     override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
-        Log.d("backend", "빌드 -onStartCommand")
+        Log.d("backend", "빌드 -onStartCommand-"+Run)
+        if(Run){
+            startForegroundService()
+        }else{
+            stopForegroundService()
+        }
+
 
         Toast.makeText(this, "service starting~~~~~~~``", Toast.LENGTH_SHORT).show()
         // For each start request, send a message to start a job and deliver the
@@ -134,7 +137,30 @@ class BackgroundService : Service() {
     }
 
     override fun onDestroy() {
-        Toast.makeText(this, "service done", Toast.LENGTH_SHORT).show()
+        Log.d("", "onDestroy")
+        Run = false
+        //Toast.makeText(this, "service done", Toast.LENGTH_SHORT).show()
+    }
+
+
+    private fun startForegroundService() {
+        Log.d("", "start foreground service.")
+
+        // Stop foreground service and remove the notification.
+       // stopForeground(true)
+
+        // Stop the foreground service.
+        ///stopSelf()
+    }
+
+     fun stopForegroundService() {
+        Log.d("", "Stop foreground service.")
+
+        // Stop foreground service and remove the notification.
+        stopForeground(true)
+
+        // Stop the foreground service.
+        stopSelf()
     }
 
 }
