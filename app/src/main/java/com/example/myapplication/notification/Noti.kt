@@ -1,9 +1,6 @@
 package com.example.myapplication.notification
 
-import android.app.Notification
-import android.app.NotificationChannel
-import android.app.NotificationManager
-import android.app.PendingIntent
+import android.app.*
 import android.content.Context
 import android.content.Intent
 import android.content.res.Resources
@@ -15,6 +12,7 @@ import androidx.fragment.app.Fragment
 import com.example.myapplication.MainActivity
 import com.example.myapplication.MediaProjectionDemo
 import com.example.myapplication.R
+import com.example.myapplication.service.BackgroundService
 
 class Noti(val _context: Context)  {
     val CHANNEL_ID = "1000212121"
@@ -42,7 +40,14 @@ class Noti(val _context: Context)  {
 
     fun build( notificationId : Int,title: String="게임봇",text:String="게임봇이 활성화중입니다."): Notification {
 
-        val notificationIntent = Intent(_context, MediaProjectionDemo::class.java)
+        val notificationIntent = Intent(_context, MainActivity::class.java)
+        notificationIntent.putExtra("action","stop")
+        val service_intent = Intent(_context, BackgroundService::class.java)
+        val pendingIntent2 = PendingIntent.getActivity(
+            _context,
+            0, service_intent, 0
+        )
+        service_intent.setAction(BackgroundService.ACTION_STOP_FOREGROUND_SERVICE);
         val pendingIntent = PendingIntent.getActivity(
             _context,
             0, notificationIntent, 0
@@ -58,7 +63,9 @@ class Noti(val _context: Context)  {
             .setSmallIcon(R.mipmap.ic_launcher)
             .setContentTitle(title)
             .setContentText(text)
-            .setContentIntent(pendingIntent).build()
+            .setContentIntent(pendingIntent)
+            .addAction(R.mipmap.ic_launcher, "정지", pendingIntent2)
+            .build()
         return builder
     }
 

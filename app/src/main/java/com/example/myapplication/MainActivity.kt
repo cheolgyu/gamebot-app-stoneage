@@ -1,25 +1,29 @@
 package com.example.myapplication
 
-import android.content.Intent
 import android.os.Build
 import android.os.Bundle
-import android.os.SystemClock
 import android.util.Log
 import android.view.MotionEvent
 import android.view.View
 import android.widget.Button
 import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import com.example.myapplication.service.BackgroundService
-import com.example.myapplication.tflite.Run
 import com.example.myapplication.worker.StartWorker
 import com.example.myapplication.worker.StopWorker
 
 
 class MainActivity : AppCompatActivity()  , View.OnClickListener{
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
+        val action = intent.extras?.getString("action")
+        if ( action!=null && action =="stop" ){
+            Log.d("action",action)
+            startForegroundService(BackgroundService.newService(this,action))
+        }
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
@@ -98,7 +102,7 @@ class MainActivity : AppCompatActivity()  , View.OnClickListener{
 
     fun move(view: View?) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            startForegroundService(BackgroundService.newService(this))
+            startForegroundService(BackgroundService.newService(this,""))
         } else {
             Log.e("sdfafasd","버전맞춰!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
         }
