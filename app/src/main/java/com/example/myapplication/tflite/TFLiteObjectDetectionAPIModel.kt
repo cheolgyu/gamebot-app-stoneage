@@ -79,7 +79,6 @@ class TFLiteObjectDetectionAPIModel public constructor() : Classifier {
                 }
             }
         }
-        Log.d("??????????",imgData.toString())
         Trace.endSection() // preprocessBitmap
 
         // Copy the input data into TensorFlow.
