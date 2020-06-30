@@ -1,5 +1,6 @@
 package com.example.myapplication
 
+import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
@@ -99,9 +100,14 @@ class MainActivity : AppCompatActivity()  , View.OnClickListener{
             ).show()
         }
 
+    fun move_btn_demo(view: View?){
+        val intent = Intent(applicationContext, MediaProjectionActivity::class.java)
+        startActivity(intent)
+    }
+
     fun service_start_btn(view: View?) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            service_action("")
+            service_action("start")
         } else {
             Log.e("sdfafasd","버전맞춰!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
         }

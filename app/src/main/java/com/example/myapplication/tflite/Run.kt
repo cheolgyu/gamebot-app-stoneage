@@ -58,9 +58,10 @@ class Run(_context: Context) {
 
 
     @Throws(java.lang.Exception::class)
-    fun get_xy(img: String): FloatArray? {
+    fun get_xy(cap_filename: String): FloatArray? {
         val canvas = Canvas(croppedBitmap!!)
-        loadImage(img)?.let {
+
+        loadImage(cap_filename)?.let {
             canvas.drawBitmap(
                 it,
                 frameToCropTransform!!,
@@ -106,13 +107,19 @@ class Run(_context: Context) {
         return overlappedArea > 0.95 * areaA && overlappedArea > 0.95 * areaB
     }
 
+
+
     @Throws(Exception::class)
     private fun loadImage(fileName: String): Bitmap? {
-        val assetManager: AssetManager =
-            context
-                .getAssets()
-        val inputStream = assetManager.open(fileName)
-        return BitmapFactory.decodeStream(inputStream)
+
+        var fis   =  FileInputStream(fileName)
+        var bitmap = BitmapFactory.decodeStream(fis)
+        fis.close()
+//        val assetManager: AssetManager =
+//            context
+//                .getAssets()
+//        val inputStream = assetManager.open(fileName)
+        return bitmap
     }
 
     // The format of result:
