@@ -57,7 +57,7 @@ class Run(_context: Context) {
 
 
 
-    @Throws(java.lang.Exception::class)
+   // @Throws(java.lang.Exception::class)
     fun get_xy(cap_filename: String): FloatArray? {
         val canvas = Canvas(croppedBitmap!!)
 
@@ -109,7 +109,7 @@ class Run(_context: Context) {
 
 
 
-    @Throws(Exception::class)
+    //@Throws(Exception::class)
     private fun loadImage(fileName: String): Bitmap? {
 
         var fis   =  FileInputStream(fileName)

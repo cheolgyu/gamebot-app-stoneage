@@ -84,16 +84,16 @@ class BackgroundService : Service() {
             try {
                 if(msg.obj != null){
 
-                    var arr :FloatArray? =model_test(msg.obj as String)
-
-                    if(arr != null){
-                        Log.e(TAG, "res============model_test not null=========================" )
-                        var cmd :String = "input tap "+String.format("%.1f", arr!!.get(0))+" "+String.format("%.1f", arr!!.get(1))
-                        Log.d(TAG, "adb -e shell " + cmd)
-                        var sh_out= ShellExecuter().Executer(cmd)
-                    }else{
-                        Log.e(TAG, "res============model_test null=========================" )
-                    }
+//                    var arr :FloatArray? =model_test(msg.obj as String)
+//
+//                    if(arr != null){
+//                        Log.e(TAG, "res============model_test not null=========================" )
+//                        var cmd :String = "input tap "+String.format("%.1f", arr!!.get(0))+" "+String.format("%.1f", arr!!.get(1))
+//                        Log.d(TAG, "adb -e shell " + cmd)
+//                        var sh_out= ShellExecuter().Executer(cmd)
+//                    }else{
+//                        Log.e(TAG, "res============model_test null=========================" )
+//                    }
 
 
 
@@ -157,11 +157,16 @@ class BackgroundService : Service() {
 
     fun model_test(cap_filename:String): FloatArray? {
         Log.d(TAG, "res=====================================model_test" )
-        var run = Run(this)
-        run.build()
+       var run = Run(this)
+       run.build()
         var res =  run.get_xy(cap_filename)
-        Log.d(TAG, "res=====================================model_test"+res.toString() )
-        return res
+      Log.d(TAG, "res=====================================model_test"+res.toString() )
+        var cmd :String = "input tap "+String.format("%.1f", res!!.get(0))+" "+String.format("%.1f", res!!.get(1))
+       // var cmd = "/system/bin/input tap 520 1826.9"
+        Log.d(TAG, "adb -e shell " + cmd)
+        var sh_out= ShellExecuter().Executer(cmd)
+        return null
+       // return res
     }
 
 
@@ -342,11 +347,13 @@ class BackgroundService : Service() {
                     )
 
                     Log.d(TAG, "-----------------------onImageAvailable----------------------------------"+my_file)
-                    startForegroundService(BackgroundService.newService(applicationContext,"cap",my_file))
+                    //startForegroundService(BackgroundService.newService(applicationContext,"cap",my_file))
+                    model_test(my_file)
                 }
             } catch (e: Exception) {
                 e.printStackTrace()
             } finally {
+
                 if (fos != null) {
                     try {
                         fos.close()
