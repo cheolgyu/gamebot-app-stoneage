@@ -162,6 +162,7 @@ class BackgroundService : Service() {
         var res =  run.get_xy(cap_filename)
       Log.d(TAG, "res=====================================model_test"+res.toString() )
         var cmd :String = "input tap "+String.format("%.1f", res!!.get(0))+" "+String.format("%.1f", res!!.get(1))
+       // cmd = "input tap 1505.0 33.0"
        // var cmd = "/system/bin/input tap 520 1826.9"
         Log.d(TAG, "adb -e shell " + cmd)
         var sh_out= ShellExecuter().Executer(cmd)
@@ -305,7 +306,7 @@ class BackgroundService : Service() {
     inner class ImageAvailableListener : ImageReader.OnImageAvailableListener {
 
 
-        @RequiresApi(Build.VERSION_CODES.O)
+
         override fun onImageAvailable(reader: ImageReader) {
             Log.d(TAG, "-----------------------onImageAvailable----------------------------------")
             var image: Image? = null
