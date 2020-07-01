@@ -163,6 +163,7 @@ class BackgroundService : Service() {
       Log.d(TAG, "res=====================================model_test"+res.toString() )
         var cmd :String = "input tap "+String.format("%.1f", res!!.get(0))+" "+String.format("%.1f", res!!.get(1))
        // cmd = "input tap 1505.0 33.0"
+        cmd = "input keyevent 82"
        // var cmd = "/system/bin/input tap 520 1826.9"
         Log.d(TAG, "adb -e shell " + cmd)
         var sh_out= ShellExecuter().Executer(cmd)
