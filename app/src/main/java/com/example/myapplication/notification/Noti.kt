@@ -52,7 +52,6 @@ class Noti(val _context: Context)  {
             Notification.Builder(_context!!, CHANNEL_ID)
 
         } else {
-            TODO("VERSION.SDK_INT < O")
             Notification.Builder(_context!!)
         }
             .setSmallIcon(R.mipmap.ic_launcher)

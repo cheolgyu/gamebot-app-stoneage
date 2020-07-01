@@ -109,6 +109,7 @@ class MainActivity : AppCompatActivity()  , View.OnClickListener{
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             service_action("start")
         } else {
+            service_action("start")
             Log.e("sdfafasd","버전맞춰!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
         }
     }
@@ -117,14 +118,34 @@ class MainActivity : AppCompatActivity()  , View.OnClickListener{
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             service_action("stop")
         } else {
-            Log.e("sdfafasd","버전맞춰!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+            Toast.makeText(
+                applicationContext,
+                "stop !", Toast.LENGTH_SHORT
+            ).show()
         }
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
-    fun service_action(action:String) {
+    private fun service_action(action:String) {
+        Toast.makeText(
+            applicationContext,
+            "else-Build.VERSION.SDK_INT="+Build.VERSION.SDK_INT, Toast.LENGTH_SHORT
+        ).show()
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            startForegroundService(BackgroundService.newService(this,action))
+            Toast.makeText(
+                applicationContext,
+                "if", Toast.LENGTH_SHORT
+            ).show()
+        }else{
+            Toast.makeText(
+                applicationContext,
+                "else"+Build.VERSION.SDK_INT, Toast.LENGTH_SHORT
+            ).show()
+            startService(BackgroundService.newService(this,action))
+
+        }
         Log.d("action",action)
-        startForegroundService(BackgroundService.newService(this,action))
+
     }
 
 }
