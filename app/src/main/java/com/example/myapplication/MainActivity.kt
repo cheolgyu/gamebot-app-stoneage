@@ -1,23 +1,29 @@
 package com.example.myapplication
 
 import android.content.Intent
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.provider.Settings
 import android.util.Log
 import android.view.MotionEvent
 import android.view.View
 import android.widget.Button
+import android.widget.Switch
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
+import com.example.myapplication.service.AlertService
 import com.example.myapplication.service.BackgroundService
 import com.example.myapplication.worker.StartWorker
 import com.example.myapplication.worker.StopWorker
 
 
 class MainActivity : AppCompatActivity()  , View.OnClickListener{
+    private val ACTION_MANAGE_OVERLAY_PERMISSION_REQUEST_CODE = 1
+
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         val action = intent.extras?.getString("action")
@@ -26,6 +32,18 @@ class MainActivity : AppCompatActivity()  , View.OnClickListener{
         }
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        val  button7 =
+            findViewById<View>(R.id.button7) as Button
+        button7.setOnClickListener {
+            checkPermission()
+            Toast.makeText(
+                applicationContext,
+                "222222222222222", Toast.LENGTH_SHORT
+            ).show()
+        }
+
+
 
         val button2 =
             findViewById<View>(R.id.button2) as Button
@@ -53,6 +71,22 @@ class MainActivity : AppCompatActivity()  , View.OnClickListener{
             ).show()
         }
 
+    }
+
+    fun checkPermission(){
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {   // 마시멜로우 이상일 경우
+            if (!Settings.canDrawOverlays(this)) {              // 체크
+                val intent = Intent(
+                    Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
+                    Uri.parse("package:$packageName")
+                )
+                startActivityForResult(intent, ACTION_MANAGE_OVERLAY_PERMISSION_REQUEST_CODE)
+            } else {
+                startService(Intent(this@MainActivity, AlertService::class.java))
+            }
+        } else {
+            startService(Intent(this@MainActivity, AlertService::class.java))
+        }
     }
 
     override fun onTouchEvent(event: MotionEvent?): Boolean {
