@@ -1,4 +1,4 @@
-package com.example.myapplication
+package com.example.background.service
 
 import android.annotation.SuppressLint
 import android.graphics.PixelFormat
@@ -11,10 +11,10 @@ import android.os.Looper
 import android.util.DisplayMetrics
 import android.util.Log
 import android.view.Display
-import com.example.myapplication.service.BackgroundService
+import com.example.background.service.BackgroundService
 
 
-class MediaProjection(
+class BackgroundServiceMP(
     val mediaProjectionManager: MediaProjectionManager,
     val display: Display,
     val STORE_DIRECTORY: String
@@ -87,7 +87,7 @@ class MediaProjection(
         )
 
         imageReader.setOnImageAvailableListener(
-            MediaProjectionListener(
+            BackgroundServiceMPListener(
                 mWidth,
                 mHeight,
                 STORE_DIRECTORY

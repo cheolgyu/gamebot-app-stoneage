@@ -1,22 +1,18 @@
-package com.example.myapplication.notification
+package com.example.background.notification
 
 import android.app.*
 import android.content.Context
 import android.content.Intent
-import android.content.res.Resources
 import android.os.Build
 import android.util.Log
-import androidx.core.app.NotificationCompat
-import androidx.core.app.NotificationManagerCompat
-import androidx.fragment.app.Fragment
-import com.example.myapplication.MainActivity
-import com.example.myapplication.MediaProjectionDemo
-import com.example.myapplication.R
-import com.example.myapplication.service.BackgroundService
+import com.example.background.MediaProjectionActivity
+import com.example.background.R
+
 
 class Noti(val _context: Context)  {
     val CHANNEL_ID = "1000212121"
     var notificationManager:NotificationManager ?= null
+
 
     fun createNotificationChannel() {
         // Create the NotificationChannel, but only on API 26+ because
@@ -40,7 +36,7 @@ class Noti(val _context: Context)  {
 
     fun build( notificationId : Int,title: String="게임봇",text:String="게임봇이 활성화중입니다."): Notification {
 
-        val notificationIntent = Intent(_context, MainActivity::class.java)
+        val notificationIntent = Intent(_context, MediaProjectionActivity::class.java)
         notificationIntent.putExtra("action","stop")
 
         val pendingIntent = PendingIntent.getActivity(

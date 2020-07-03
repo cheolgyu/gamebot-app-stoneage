@@ -9,14 +9,11 @@ import android.util.Log
 import android.view.MotionEvent
 import android.view.View
 import android.widget.Button
-import android.widget.Switch
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
-import androidx.work.OneTimeWorkRequestBuilder
-import androidx.work.WorkManager
 import com.example.myapplication.service.AlertService
-import com.example.myapplication.service.BackgroundService
+import com.example.background.service.BackgroundService
 
 
 
@@ -121,7 +118,7 @@ class MainActivity : AppCompatActivity()  , View.OnClickListener{
         }
 
     fun move_btn_demo(view: View?){
-        val intent = Intent(applicationContext, MediaProjectionActivity::class.java)
+        val intent = Intent(applicationContext, com.example.background.MediaProjectionActivity::class.java)
         startActivity(intent)
     }
 
