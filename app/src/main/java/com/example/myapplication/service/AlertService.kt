@@ -2,17 +2,14 @@ package com.example.myapplication.service
 
 import android.app.Service
 import android.content.Context
-import android.content.Context.WINDOW_SERVICE
 import android.content.Intent
 import android.graphics.PixelFormat
 import android.os.Build
 import android.os.IBinder
 import android.view.*
 import android.widget.Button
-import android.widget.ImageButton
 import android.widget.TextView
 import androidx.annotation.RequiresApi
-import androidx.core.content.ContextCompat.getSystemService
 import com.example.myapplication.R
 
 
