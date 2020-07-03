@@ -1,11 +1,11 @@
-package com.example.myapplication.tflite
+package com.example.tf.tflite
 
 import android.content.res.AssetManager
 import android.graphics.Bitmap
 import android.graphics.RectF
 import android.os.Trace
 import android.util.Log
-import com.example.myapplication.env.Logger
+import com.example.tf.env.Logger
 import org.tensorflow.lite.Interpreter
 import java.io.BufferedReader
 import java.io.FileInputStream
