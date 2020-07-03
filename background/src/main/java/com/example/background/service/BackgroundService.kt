@@ -1,4 +1,4 @@
-package com.example.myapplication.service
+package com.example.background.service
 
 import android.app.Service
 import android.content.Context
@@ -8,10 +8,8 @@ import android.os.*
 import android.util.Log
 import android.view.WindowManager
 import android.widget.Toast
-import com.example.myapplication.MediaProjection
-import com.example.myapplication.MediaProjectionActivity
-import com.example.myapplication.notification.Noti
-import com.example.tf.tflite.Run
+import com.example.background.notification.Noti
+//import com.example.tf.tflite.Run
 import java.io.File
 
 
@@ -21,7 +19,7 @@ class BackgroundService : Service() {
         private val FOREGROUND_SERVICE_ID = 1000
         private var cap_filename: String? = null
         var STORE_DIRECTORY: String? = null
-        val TAG: String = com.example.myapplication.MediaProjectionActivity::class.java.getName()
+        val TAG: String = com.example.background.MediaProjectionActivity::class.java.getName()
 
         var context: Context? = null
         var my_action: String? = null
@@ -69,7 +67,7 @@ class BackgroundService : Service() {
         if (Run) {
             if (my_action == "createVirtualDisplay") {
                 var windowManager = getSystemService(Context.WINDOW_SERVICE) as WindowManager
-                MediaProjection(
+                BackgroundServiceMP(
                     mediaProjectionManager,
                     windowManager.defaultDisplay,
                     STORE_DIRECTORY!!
@@ -84,19 +82,19 @@ class BackgroundService : Service() {
         return START_STICKY
     }
 
-    fun tflite_run(cap_filename: String): FloatArray? {
-        Log.d(TAG, "res=====================================tflite_run")
-        var run = Run(this)
-        run.build()
-        var res = run.get_xy(cap_filename)
-        Log.d(TAG, "res=====================================modetflite_runl_test" + res.toString())
-        var cmd: String = "input tap " + String.format("%.1f", res!!.get(0)) + " " + String.format(
-            "%.1f",
-            res!!.get(1)
-        )
-        return null
-        // return res
-    }
+//    fun tflite_run(cap_filename: String): FloatArray? {
+//        Log.d(TAG, "res=====================================tflite_run")
+//        var run = Run(this)
+//        run.build()
+//        var res = run.get_xy(cap_filename)
+//        Log.d(TAG, "res=====================================modetflite_runl_test" + res.toString())
+//        var cmd: String = "input tap " + String.format("%.1f", res!!.get(0)) + " " + String.format(
+//            "%.1f",
+//            res!!.get(1)
+//        )
+//        return null
+//        // return res
+//    }
 
 
     fun run_notify() {
@@ -122,7 +120,7 @@ class BackgroundService : Service() {
         //생성
 
         //권환얻기=> 는 액티비티
-        startActivity(MediaProjectionActivity.newInstance(this))
+        startActivity(com.example.background.MediaProjectionActivity.newInstance(this))
         Log.e(
             TAG,
             "--------------BackgroundService --------my_media----------------------Run=" + Run

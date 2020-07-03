@@ -1,4 +1,4 @@
-package com.example.myapplication
+package com.example.background.service
 
 import android.content.ContentValues.TAG
 import android.graphics.Bitmap
@@ -9,7 +9,7 @@ import java.io.FileOutputStream
 import java.io.IOException
 import java.nio.ByteBuffer
 
-class MediaProjectionListener(val mWidth: Int, val mHeight: Int, val STORE_DIRECTORY: String) :
+class BackgroundServiceMPListener(val mWidth: Int, val mHeight: Int, val STORE_DIRECTORY: String) :
     ImageReader.OnImageAvailableListener {
 
     private var IMAGES_PRODUCED = 0

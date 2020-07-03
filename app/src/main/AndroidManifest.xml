@@ -20,7 +20,7 @@
             android:permission="android.permission.SYSTEM_ALERT_WINDOW" />
 
         <service
-            android:name=".service.BackgroundService"
+            android:name="com.example.background.service.BackgroundService"
             android:foregroundServiceType="mediaProjection" />
 
         <activity android:name=".MainActivity">
@@ -30,12 +30,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".MediaProjectionDemo">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-            </intent-filter>
-        </activity>
-        <activity android:name=".MediaProjectionActivity">
+
+        <activity android:name="com.example.background.MediaProjectionActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
