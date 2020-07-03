@@ -1,15 +1,12 @@
-package com.example.myapplication.tflite
+package com.example.tf.tflite
 
 import android.content.Context
 import android.content.res.AssetManager
 import android.graphics.*
 import android.util.Log
 import android.util.Size
-import com.example.myapplication.env.ImageUtils
-import java.io.File
+import com.example.tf.env.ImageUtils
 import java.io.FileInputStream
-import java.io.FileNotFoundException
-import java.io.InputStream
 import java.util.*
 
 

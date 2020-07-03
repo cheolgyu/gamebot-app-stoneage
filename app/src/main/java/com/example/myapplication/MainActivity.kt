@@ -17,8 +17,7 @@ import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import com.example.myapplication.service.AlertService
 import com.example.myapplication.service.BackgroundService
-import com.example.myapplication.worker.StartWorker
-import com.example.myapplication.worker.StopWorker
+
 
 
 class MainActivity : AppCompatActivity()  , View.OnClickListener{
@@ -108,19 +107,6 @@ class MainActivity : AppCompatActivity()  , View.OnClickListener{
         Toast.makeText(this, "1111111111111111111", Toast.LENGTH_SHORT).show()
     }
 
-    fun work_start(view: View?) {
-        Toast.makeText(this, "work_start", Toast.LENGTH_SHORT).show()
-        val uploadWorkRequest = OneTimeWorkRequestBuilder<StartWorker>()
-            .build()
-        WorkManager.getInstance(applicationContext).enqueue(uploadWorkRequest)
-    }
-
-    fun work_stop(view: View?) {
-        Toast.makeText(this, "work_stop", Toast.LENGTH_SHORT).show()
-        val uploadWorkRequest = OneTimeWorkRequestBuilder<StopWorker>()
-            .build()
-        WorkManager.getInstance(applicationContext).enqueue(uploadWorkRequest)
-    }
     override fun onClick(p0: View?) {
         TODO("Not yet implemented")
         Toast.makeText(this, "0000000000000000000", Toast.LENGTH_SHORT).show();

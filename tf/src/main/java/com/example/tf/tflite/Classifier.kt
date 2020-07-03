@@ -1,4 +1,4 @@
-package com.example.myapplication.tflite
+package com.example.tf.tflite
 
 import android.graphics.Bitmap
 import android.graphics.RectF

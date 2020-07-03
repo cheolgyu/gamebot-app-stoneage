@@ -15,10 +15,6 @@ android {
         jvmTarget = JavaVersion.VERSION_1_8.toString()
     }
 
-    aaptOptions {
-        noCompress "tflite"
-    }
-
     defaultConfig {
         applicationId "com.example.myapplication"
         minSdkVersion 21
@@ -39,9 +35,6 @@ android {
 
 dependencies {
     implementation fileTree(dir: "libs", include: ["*.jar",'*.aar'])
-    implementation 'androidx.appcompat:appcompat:1.0.0'
-    implementation 'com.google.android.material:material:1.0.0'
-    implementation('org.tensorflow:tensorflow-lite:0.0.0-nightly') { changing = true }
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
     implementation 'androidx.core:core-ktx:1.1.0'
     def activityVersion = "1.2.0-alpha04"
@@ -65,5 +58,5 @@ dependencies {
     implementation "androidx.work:work-gcm:$work_version"
     // optional - Test helpers
     androidTestImplementation "androidx.work:work-testing:$work_version"
-
+    compile project(':tf')
 }

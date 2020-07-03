@@ -19,11 +19,10 @@ import android.util.Log
 import android.view.Display
 import android.view.WindowManager
 import android.widget.Toast
-import androidx.annotation.RequiresApi
 import com.example.myapplication.MediaProjectionActivity
 import com.example.myapplication.ShellExecuter
 import com.example.myapplication.notification.Noti
-import com.example.myapplication.tflite.Run
+import com.example.tf.tflite.Run
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
