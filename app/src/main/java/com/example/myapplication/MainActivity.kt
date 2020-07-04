@@ -14,14 +14,19 @@ import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import com.example.myapplication.service.AlertService
 import com.example.background.service.BackgroundService
-
+import com.example.myapplication.service.TouchService
 
 
 class MainActivity : AppCompatActivity()  , View.OnClickListener{
     private val ACTION_MANAGE_OVERLAY_PERMISSION_REQUEST_CODE = 1
 
+    fun start_touch_service_btn(){
+        startService(Intent(this,TouchService::class.java))
+    }
+
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
+       // start_touch_service_btn()
         val action = intent.extras?.getString("action")
         if ( action!=null && action =="stop" ){
             service_action(action)
