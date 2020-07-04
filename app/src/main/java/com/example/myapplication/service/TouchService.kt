@@ -1,15 +1,19 @@
 package com.example.myapplication.service
 
 import android.accessibilityservice.AccessibilityService
+import android.accessibilityservice.GestureDescription
+import android.accessibilityservice.GestureDescription.StrokeDescription
 import android.content.Context
+import android.graphics.Path
 import android.graphics.PixelFormat
 import android.view.Gravity
 import android.view.LayoutInflater
+import android.view.View
 import android.view.WindowManager
 import android.view.accessibility.AccessibilityEvent
+import android.widget.Button
 import android.widget.FrameLayout
 import com.example.myapplication.R
-
 
 class TouchService : AccessibilityService() {
     var mLayout: FrameLayout? = null
@@ -32,6 +36,21 @@ class TouchService : AccessibilityService() {
 
         inflater.inflate(R.layout.action_bar, mLayout)
         wm.addView(mLayout, lp)
+        configureSwipeButton();
+    }
+
+    private fun configureSwipeButton() {
+        val swipeButton: Button = mLayout!!.findViewById<View>(R.id.swipe) as Button
+        swipeButton.setOnClickListener(object : View.OnClickListener {
+            override fun onClick(view: View?) {
+                val swipePath = Path()
+                swipePath.moveTo(1000F, 1000F)
+                swipePath.lineTo(100F, 1000F)
+                val gestureBuilder = GestureDescription.Builder()
+                gestureBuilder.addStroke(StrokeDescription(swipePath, 0, 500))
+                dispatchGesture(gestureBuilder.build(), null, null)
+            }
+        })
     }
     override fun onInterrupt() {
     }
