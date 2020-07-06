@@ -11,6 +11,10 @@ android {
         targetCompatibility JavaVersion.VERSION_1_8
     }
 
+    aaptOptions {
+        noCompress "tflite"
+    }
+
     kotlinOptions {
         jvmTarget = JavaVersion.VERSION_1_8.toString()
     }
@@ -58,6 +62,6 @@ dependencies {
     implementation "androidx.work:work-gcm:$work_version"
     // optional - Test helpers
     androidTestImplementation "androidx.work:work-testing:$work_version"
-    compile project(':tf')
+
     compile project(':background')
 }
