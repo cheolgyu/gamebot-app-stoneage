@@ -11,7 +11,6 @@ import android.os.Looper
 import android.util.DisplayMetrics
 import android.util.Log
 import android.view.Display
-import com.example.background.service.BackgroundService
 
 
 class BackgroundServiceMP(
@@ -85,13 +84,29 @@ class BackgroundServiceMP(
             null,
             mHandler
         )
+        var mHandler2 : Handler? =null
+        // start capture handling thread
+//        object : Thread() {
+//            override fun run() {
+//                Looper.prepare()
+//                mHandler2 = Handler()
+//                Looper.loop()
+//            }
+//        }.start()
+
+//        mHandler2.
+//        while (true){
+//            var img = imageReader.acquireLatestImage()
+//            Log.e("test",img.toString())
+//        }
+
 
         imageReader.setOnImageAvailableListener(
             BackgroundServiceMPListener(
                 mWidth,
                 mHeight,
                 STORE_DIRECTORY
-            ), mHandler
+            ), null
         )
         Log.d(TAG, "22222222222222222222222222222222222")
 
