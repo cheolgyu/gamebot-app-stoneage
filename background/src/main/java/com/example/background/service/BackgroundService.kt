@@ -1,15 +1,15 @@
 package com.example.background.service
 
+//import com.example.tf.tflite.Run
 import android.app.Service
 import android.content.Context
 import android.content.Intent
 import android.media.projection.MediaProjectionManager
-import android.os.*
+import android.os.IBinder
 import android.util.Log
 import android.view.WindowManager
 import android.widget.Toast
 import com.example.background.notification.Noti
-//import com.example.tf.tflite.Run
 import java.io.File
 
 
@@ -66,6 +66,15 @@ class BackgroundService : Service() {
         )
         if (Run) {
             if (my_action == "createVirtualDisplay") {
+                //
+                /*
+
+                백그라운드 서비스 에서 이미지리더 생성후
+                var img = imageReader.acquireLatestImage() 로 이미지 가져오고
+                tflite로 좌표구하고
+                구한결과 접근성.터치 로 실행.
+
+                 */
                 var windowManager = getSystemService(Context.WINDOW_SERVICE) as WindowManager
                 BackgroundServiceMP(
                     mediaProjectionManager,

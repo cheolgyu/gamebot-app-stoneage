@@ -12,16 +12,16 @@ import android.widget.Button
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
-import com.example.myapplication.service.AlertService
 import com.example.background.service.BackgroundService
-import com.example.myapplication.service.TouchService
+import com.example.background.service.TouchService
+import com.example.myapplication.service.AlertService
 
 
 class MainActivity : AppCompatActivity()  , View.OnClickListener{
     private val ACTION_MANAGE_OVERLAY_PERMISSION_REQUEST_CODE = 1
 
     fun start_touch_service_btn(){
-        startService(Intent(this,TouchService::class.java))
+        startService(Intent(this, TouchService::class.java))
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
