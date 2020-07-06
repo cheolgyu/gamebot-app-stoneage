@@ -150,7 +150,7 @@ class MainActivity : AppCompatActivity()  , View.OnClickListener{
     private fun service_action(action:String) {
         Toast.makeText(
             applicationContext,
-            "else-Build.VERSION.SDK_INT="+Build.VERSION.SDK_INT, Toast.LENGTH_SHORT
+            "service_action-Build.VERSION.SDK_INT="+Build.VERSION.SDK_INT, Toast.LENGTH_SHORT
         ).show()
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             startForegroundService(BackgroundService.newService(this,action))
@@ -161,7 +161,7 @@ class MainActivity : AppCompatActivity()  , View.OnClickListener{
         }else{
             Toast.makeText(
                 applicationContext,
-                "else"+Build.VERSION.SDK_INT, Toast.LENGTH_SHORT
+                "else--------!!!"+Build.VERSION.SDK_INT, Toast.LENGTH_SHORT
             ).show()
             startService(BackgroundService.newService(this,action))
 

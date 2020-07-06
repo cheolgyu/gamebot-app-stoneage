@@ -1,7 +1,6 @@
 package com.example.background.service
 
 import android.annotation.SuppressLint
-import android.graphics.PixelFormat
 import android.graphics.Point
 import android.hardware.display.DisplayManager
 import android.media.ImageReader
@@ -16,12 +15,12 @@ import android.view.Display
 class BackgroundServiceMP(
     val mediaProjectionManager: MediaProjectionManager,
     val display: Display,
+    val imageReader: ImageReader,
     val STORE_DIRECTORY: String
 ) {
 
 
     val TAG: String = ""
-    var mDisplay: Display? = null
     var mDensity = 0
     var mWidth = 100
     var mHeight = 100
@@ -57,7 +56,6 @@ class BackgroundServiceMP(
         val metrics = DisplayMetrics()
         display.getMetrics(metrics)
         mDensity = metrics.densityDpi
-        mDisplay = display
 
         // get width and height
         val size = Point()
@@ -65,14 +63,14 @@ class BackgroundServiceMP(
         mWidth = size.x
         mHeight = size.y
 
-
-        // start capture reader
-        var imageReader = ImageReader.newInstance(
-            mWidth,
-            mHeight,
-            PixelFormat.RGBA_8888,
-            2
-        )
+//
+//        // start capture reader
+//        var imageReader = ImageReader.newInstance(
+//            mWidth,
+//            mHeight,
+//            PixelFormat.RGBA_8888,
+//            2
+//        )
 
         mediaProjection.createVirtualDisplay(
             SCREENCAP_NAME,
@@ -101,13 +99,13 @@ class BackgroundServiceMP(
 //        }
 
 
-        imageReader.setOnImageAvailableListener(
-            BackgroundServiceMPListener(
-                mWidth,
-                mHeight,
-                STORE_DIRECTORY
-            ), null
-        )
+//        imageReader.setOnImageAvailableListener(
+//            BackgroundServiceMPListener(
+//                mWidth,
+//                mHeight,
+//                STORE_DIRECTORY
+//            ), null
+//        )
         Log.d(TAG, "22222222222222222222222222222222222")
 
     }

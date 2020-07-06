@@ -13,8 +13,8 @@ import java.util.*
 class Run(_context: Context) {
     private val MODEL_INPUT_SIZE = 300
     private val IS_MODEL_QUANTIZED = false
-    private val MODEL_FILE = "test/detect_copy2.tflite"
-    private val LABELS_FILE = "file:///android_asset/test/labelmap.txt"
+    private val MODEL_FILE = "detect_copy2.tflite"
+    private val LABELS_FILE = "file:///android_asset/labelmap_copy2.txt"
     private val IMAGE_SIZE = Size(640, 480)
 
     private var detector: Classifier? = null
@@ -24,6 +24,7 @@ class Run(_context: Context) {
     var context: Context = _context
 
     fun build() {
+        context
         val assetManager: AssetManager =
             context.getAssets()
         detector = TFLiteObjectDetectionAPIModel.create(
