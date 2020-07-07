@@ -8,21 +8,14 @@ import android.view.MotionEvent
 import android.view.View
 import android.widget.Button
 import android.widget.Toast
-import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import com.example.background.CheckTouch
 import com.example.background.service.BackgroundService
-import com.example.background.service.TouchService
 
 
 class MainActivity : AppCompatActivity()  , View.OnClickListener{
     private val ACTION_MANAGE_OVERLAY_PERMISSION_REQUEST_CODE = 1
 
-    fun start_touch_service_btn(){
-        startService(Intent(this, TouchService::class.java))
-    }
-
-    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         var chk = CheckTouch(this)
         if(!chk.checkAccessibilityPermissions()){

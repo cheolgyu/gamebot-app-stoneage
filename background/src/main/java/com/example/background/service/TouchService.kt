@@ -76,7 +76,8 @@ class TouchService : AccessibilityService() {
         val btn: Button = mLayout!!.findViewById<View>(R.id.start) as Button
         btn.setOnClickListener(object : View.OnClickListener {
             override fun onClick(view: View?) {
-                startService(BackgroundService.newService(applicationContext,"start"))
+                startActivity(com.example.background.MediaProjectionActivity.newInstance(applicationContext))
+
             }
         })
     }

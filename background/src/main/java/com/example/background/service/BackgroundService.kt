@@ -23,6 +23,8 @@ import java.io.FileOutputStream
 import java.nio.ByteBuffer
 
 var RUN_BACKGROUND = false
+var my_data: Intent? = null
+var my_resultCode: Int? = null
 
 class BackgroundService : Service() {
     companion object {
@@ -37,9 +39,6 @@ class BackgroundService : Service() {
 
         var context: Context? = null
         var my_action: String? = null
-
-        var my_data: Intent? = null
-        var my_resultCode: Int? = null
 
         fun newService(_context: Context, _action: String): Intent =
             Intent(_context, BackgroundService::class.java).apply {
@@ -248,7 +247,7 @@ class BackgroundService : Service() {
         //생성
 
         //권환얻기=> 는 액티비티
-        startActivity(com.example.background.MediaProjectionActivity.newInstance(this))
+        startActivity(com.example.background.MediaProjectionActivity.newInstance(context!!))
         Log.e(
             TAG,
             "--------------BackgroundService --------my_media----------------------RUN_BACKGROUND=" + RUN_BACKGROUND
