@@ -13,13 +13,6 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
 
-
-        <service
-            android:name=".service.AlertService"
-            android:enabled="true"
-            android:permission="android.permission.SYSTEM_ALERT_WINDOW" />
-
-
         <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
