@@ -34,8 +34,8 @@ class BackgroundServiceMP(
 
         var mediaProjection =
             mediaProjectionManager.getMediaProjection(
-                BackgroundService.my_resultCode!!,
-                BackgroundService.my_data!!
+                my_resultCode!!,
+                my_data!!
             )
 
 
