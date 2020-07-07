@@ -115,8 +115,8 @@ class BackgroundService : Service() {
                             )
                             var file = image_available()
                             if (file != null) {
-                                var arr : FloatArray =  tflite_run(file)
-                                if(arr.size >0){
+                                var arr : FloatArray? =  tflite_run(file)
+                                if(arr != null){
                                     var x = arr.get(0)
                                     var y = arr.get(1)
                                     Log.e(
@@ -124,6 +124,11 @@ class BackgroundService : Service() {
                                         "--------------$x---$y---------------------------"
                                     )
                                     touchService!!.click(x,y)
+                                }else{
+                                    Log.e(
+                                        "쓰레드",
+                                        "tflite_run return null "
+                                    )
                                 }
                             }else{
                                 Log.e(
@@ -209,16 +214,13 @@ class BackgroundService : Service() {
         )
     }
 
-    fun tflite_run(cap_filename: String): FloatArray {
+    fun tflite_run(cap_filename: String): FloatArray? {
         Log.d(TAG, "res=====================================tflite_run")
         var run = com.example.tf.tflite.Run(this)
         run.build()
         var res = run.get_xy(cap_filename)
         Log.d(TAG, "res=====================================modetflite_runl_test" + res.toString())
-        var cmd: String = "input tap " + String.format("%.1f", res!!.get(0)) + " " + String.format(
-            "%.1f",
-            res!!.get(1)
-        )
+
         //return null
         return res
     }
