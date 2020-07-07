@@ -38,15 +38,23 @@ class TouchService : AccessibilityService() {
 
         inflater.inflate(R.layout.action_bar, mLayout)
         wm.addView(mLayout, lp)
-        configureSwipeButton();
+
+        configure()
+
         touchService =this
+    }
+
+    fun configure(){
+        configureSwipeButton()
+        configureStopButton()
+        configureStartButton()
     }
 
     fun click(x: Float, y: Float) {
         val clickPath = Path()
         clickPath.moveTo(x, y)
         val gestureBuilder = GestureDescription.Builder()
-        gestureBuilder.addStroke(StrokeDescription(clickPath, 0, 500))
+        gestureBuilder.addStroke(StrokeDescription(clickPath, 0, 1000))
         dispatchGesture(gestureBuilder.build(), null, null)
     }
 
@@ -64,6 +72,23 @@ class TouchService : AccessibilityService() {
         })
     }
 
+    private fun configureStartButton() {
+        val btn: Button = mLayout!!.findViewById<View>(R.id.start) as Button
+        btn.setOnClickListener(object : View.OnClickListener {
+            override fun onClick(view: View?) {
+                startService(BackgroundService.newService(applicationContext,"start"))
+            }
+        })
+    }
+
+    private fun configureStopButton() {
+        val btn: Button = mLayout!!.findViewById<View>(R.id.stop) as Button
+        btn.setOnClickListener(object : View.OnClickListener {
+            override fun onClick(view: View?) {
+                startService(BackgroundService.newService(applicationContext,"stop"))
+            }
+        })
+    }
     override fun onInterrupt() {
     }
 
