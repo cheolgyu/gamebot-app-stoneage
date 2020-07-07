@@ -50,7 +50,7 @@ class MediaProjectionActivity : AppCompatActivity() {
             startForegroundService(
                 BackgroundService.newService(
                     this,
-                    "createVirtualDisplay",
+                    "start",
                     resultCode,
                     data!!
                 )

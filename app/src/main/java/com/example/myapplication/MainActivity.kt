@@ -12,6 +12,7 @@ import android.widget.Button
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
+import com.example.background.CheckTouch
 import com.example.background.service.BackgroundService
 import com.example.background.service.TouchService
 import com.example.myapplication.service.AlertService
@@ -26,6 +27,10 @@ class MainActivity : AppCompatActivity()  , View.OnClickListener{
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
+        var chk = CheckTouch(this)
+        if(!chk.checkAccessibilityPermissions()){
+            chk.setAccessibilityPermissions()
+        }
        // start_touch_service_btn()
         val action = intent.extras?.getString("action")
         if ( action!=null && action =="stop" ){

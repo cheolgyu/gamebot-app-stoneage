@@ -22,6 +22,7 @@ import java.io.File
 import java.io.FileOutputStream
 import java.nio.ByteBuffer
 
+var RUN_BACKGROUND = false
 
 class BackgroundService : Service() {
     companion object {
@@ -29,7 +30,6 @@ class BackgroundService : Service() {
         var mWidth: Int? = null
         var mHeight: Int? = null
 
-        var Run = false
         private val FOREGROUND_SERVICE_ID = 1000
         private var cap_filename: String? = null
         var STORE_DIRECTORY: String? = null
@@ -45,10 +45,10 @@ class BackgroundService : Service() {
             Intent(_context, BackgroundService::class.java).apply {
                 my_action = _action
                 context = _context
-                if (_action == "start" || _action == "createVirtualDisplay") {
-                    Run = true
+                if (_action == "start" ) {
+                    RUN_BACKGROUND = true
                 } else if (_action == "stop") {
-                    Run = false
+                    RUN_BACKGROUND = false
                 }
             }
 
@@ -59,14 +59,16 @@ class BackgroundService : Service() {
                 my_action = _action
                 context = _context
                 //cap_bitmap = bitmap
-                Run = true
+                RUN_BACKGROUND = true
             }
     }
 
     override fun onCreate() {
         Log.e(TAG, "--------------BackgroundService --------onCreate----------------------")
-        run_notify()
-        ready_media()
+        if(RUN_BACKGROUND){
+            run_notify()
+            ready_media()
+        }
     }
 
     private val mediaProjectionManager: MediaProjectionManager by lazy {
@@ -81,10 +83,9 @@ class BackgroundService : Service() {
     override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
         Log.e(
             TAG,
-            "--------------BackgroundService --------onStartCommand---------Run=$Run,action=$my_action"
+            "--------------BackgroundService --------onStartCommand---------RUN_BACKGROUND=$RUN_BACKGROUND,action=$my_action"
         )
-        if (Run) {
-            if (my_action == "createVirtualDisplay") {
+        if (RUN_BACKGROUND) {
                 //
                 /*
 
@@ -107,7 +108,8 @@ class BackgroundService : Service() {
                 // start capture handling thread
                 object : Thread() {
                     override fun run() {
-                        while (true){
+                        while (RUN_BACKGROUND){
+                            Thread.sleep(1000)
                             Log.e(
                                 "쓰레드",
                                 "--------------------------------------------"
@@ -118,7 +120,10 @@ class BackgroundService : Service() {
                                 if(arr.size >0){
                                     var x = arr.get(0)
                                     var y = arr.get(1)
-
+                                    Log.e(
+                                        "쓰레드",
+                                        "--------------$x---$y---------------------------"
+                                    )
                                     touchService!!.click(x,y)
                                 }
                             }else{
@@ -131,7 +136,6 @@ class BackgroundService : Service() {
                     }
                 }.start()
 
-            }
             Toast.makeText(this, "service starting~~~~~~~``", Toast.LENGTH_SHORT).show()
         } else {
             stopForegroundService()
@@ -228,7 +232,7 @@ class BackgroundService : Service() {
         startForeground(FOREGROUND_SERVICE_ID, notify)
         Log.e(
             TAG,
-            "--------------BackgroundService --------my_notify----------------------Run=" + Run
+            "--------------BackgroundService --------my_notify----------------------RUN_BACKGROUND=" + RUN_BACKGROUND
         )
     }
 
@@ -247,7 +251,7 @@ class BackgroundService : Service() {
         startActivity(com.example.background.MediaProjectionActivity.newInstance(this))
         Log.e(
             TAG,
-            "--------------BackgroundService --------my_media----------------------Run=" + Run
+            "--------------BackgroundService --------my_media----------------------RUN_BACKGROUND=" + RUN_BACKGROUND
         )
     }
 
@@ -285,7 +289,7 @@ class BackgroundService : Service() {
 
     override fun onDestroy() {
         Log.d("", "onDestroy")
-        Run = false
+        RUN_BACKGROUND = false
         //Toast.makeText(this, "service done", Toast.LENGTH_SHORT).show()
     }
 
