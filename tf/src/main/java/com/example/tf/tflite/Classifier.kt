@@ -35,6 +35,14 @@ interface Classifier {
             return confidence
         }
 
+        fun getConfidence_int(): Int {
+            var resultString = 0
+            if (confidence != null) {
+                resultString = (confidence * 100.0f).toInt()
+            }
+            return  resultString
+        }
+
         fun getLocation(): RectF {
             return RectF(location)
         }
