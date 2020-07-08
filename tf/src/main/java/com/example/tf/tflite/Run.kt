@@ -12,10 +12,10 @@ import java.util.*
 
 class Run(_context: Context) {
 
-    private val CONFIDENCE = 0.6
+    private val CONFIDENCE = 6
     private val MODEL_INPUT_SIZE = 300
     private val IS_MODEL_QUANTIZED = false
-    private val MODEL_FILE = "detect_copy2.tflite"
+    private val MODEL_FILE = "detect_copy3.tflite"
     private val LABELS_FILE = "file:///android_asset/labelmap_copy2.txt"
     private val IMAGE_SIZE = Size(640, 480)
 
@@ -75,8 +75,10 @@ class Run(_context: Context) {
         var f_arr = FloatArray(2)
         if (results!!.isNotEmpty()){
             var max_item = results[0]
-            var con = max_item?.getConfidence()!!
+            var con = max_item?.getConfidence_int()!!
+            Log.d("모델결과-con: ","$con % ")
             if(con < CONFIDENCE){
+                Log.d("모델결과-Confidence 너무낮아",max_item.toString())
                 Log.d("모델결과-Confidence 너무낮아","$con")
                 return  null
             }
