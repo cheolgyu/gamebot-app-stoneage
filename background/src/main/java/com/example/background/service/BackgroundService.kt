@@ -13,6 +13,7 @@ import android.media.Image
 import android.media.ImageReader
 import android.media.projection.MediaProjectionManager
 import android.os.IBinder
+import android.os.SystemClock
 import android.util.DisplayMetrics
 import android.util.Log
 import android.view.WindowManager
@@ -25,6 +26,7 @@ import java.nio.ByteBuffer
 var RUN_BACKGROUND = false
 var my_data: Intent? = null
 var my_resultCode: Int? = null
+var STORE_DIRECTORY: String? = null
 
 class BackgroundService : Service() {
     companion object {
@@ -34,7 +36,8 @@ class BackgroundService : Service() {
 
         private val FOREGROUND_SERVICE_ID = 1000
         private var cap_filename: String? = null
-        var STORE_DIRECTORY: String? = null
+
+        var STORE_DIRECTORY_CHK: String? = null
         val TAG: String = com.example.background.MediaProjectionActivity::class.java.getName()
 
         var context: Context? = null
@@ -113,9 +116,10 @@ class BackgroundService : Service() {
                                 "쓰레드",
                                 "--------------------------------------------"
                             )
-                            var file = image_available()
-                            if (file != null) {
-                                var arr : FloatArray? =  tflite_run(file)
+                            var full_path = image_available()
+
+                            if (full_path != null) {
+                                var arr : FloatArray? =  tflite_run(full_path)
                                 if(arr != null){
                                     var x = arr.get(0)
                                     var y = arr.get(1)
@@ -171,9 +175,11 @@ class BackgroundService : Service() {
             // write bitmap to a file
 
             // write bitmap to a file
-            var my_file = STORE_DIRECTORY + "myscreen_" + IMAGES_PRODUCED + ".JPEG"
+            val file_id = SystemClock.uptimeMillis()
+            var my_file = STORE_DIRECTORY  + file_id + ".JPEG"
             fos =
                 FileOutputStream(my_file)
+
             bitmap.compress(Bitmap.CompressFormat.JPEG, 100, fos)
 
             IMAGES_PRODUCED++
@@ -214,12 +220,11 @@ class BackgroundService : Service() {
         )
     }
 
-    fun tflite_run(cap_filename: String): FloatArray? {
+    fun tflite_run(full_path:String): FloatArray? {
         Log.d(TAG, "res=====================================tflite_run")
         var run = com.example.tf.tflite.Run(this)
         run.build()
-        var res = run.get_xy(cap_filename)
-        Log.d(TAG, "res=====================================modetflite_runl_test" + res.toString())
+        var res = run.get_xy(full_path)
 
         //return null
         return res
@@ -263,7 +268,9 @@ class BackgroundService : Service() {
                 externalFilesDir.absolutePath + "/screenshots/"
             val storeDirectory =
                 File(STORE_DIRECTORY)
+            storeDirectory.deleteRecursively()
             if (!storeDirectory.exists()) {
+
                 val success: Boolean = storeDirectory.mkdirs()
                 if (!success) {
                     Log.e(
