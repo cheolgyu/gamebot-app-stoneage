@@ -254,7 +254,7 @@ class BackgroundService : Service() {
         //생성
 
         //권환얻기=> 는 액티비티
-        startActivity(com.example.background.MediaProjectionActivity.newInstance(context!!))
+       // startActivity(com.example.background.MediaProjectionActivity.newInstance(context!!))
         Log.e(
             TAG,
             "--------------BackgroundService --------my_media----------------------RUN_BACKGROUND=" + RUN_BACKGROUND
