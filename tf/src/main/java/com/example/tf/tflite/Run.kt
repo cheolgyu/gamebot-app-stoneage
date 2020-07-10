@@ -35,21 +35,21 @@ class Run(_context: Context) {
     private var frameToCropTransform: Matrix? = null
     private var ori_frameToCropTransform: Matrix? = null
     private var cropToFrameTransform: Matrix? = null
-    var frameToCanvasMatrix : Matrix? = null
+    var frameToCanvasMatrix: Matrix? = null
     var context: Context = _context
 
-    fun build( fullPath : String) {
+    fun build(fullPath: String) {
 
-        var bitmap=  loadImage(fullPath)
+        var bitmap = loadImage(fullPath)
 
         previewWidth = bitmap!!.width
         previewHeight = bitmap!!.height
 
-        Log.e("run.kt","previewWidth=$previewWidth, previewHeight=$previewHeight")
+        Log.e("run.kt", "previewWidth=$previewWidth, previewHeight=$previewHeight")
 
         //이값 수정해야대. 복붙한값 디바이스에따라 달라짐.
         sensorOrientation = 90
-        oriBitmap= Bitmap.createBitmap(previewWidth, previewHeight, Bitmap.Config.ARGB_8888)
+        oriBitmap = Bitmap.createBitmap(previewWidth, previewHeight, Bitmap.Config.ARGB_8888)
 
         tracker = MultiBoxTracker(context)
         tracker!!.setFrameConfiguration(previewWidth, previewHeight, sensorOrientation!!)
@@ -85,7 +85,7 @@ class Run(_context: Context) {
             true
         )
 
-        cropToFrameTransform =  ImageUtils.Companion.getTransformationMatrix(
+        cropToFrameTransform = ImageUtils.Companion.getTransformationMatrix(
             previewWidth,
             previewHeight,
             cropSize,
@@ -93,13 +93,13 @@ class Run(_context: Context) {
             sensorOrientation,
             true
         )
-            //frameToCropTransform?.invert(cropToFrameTransform)
+        //frameToCropTransform?.invert(cropToFrameTransform)
 
 
         //val rotated = sensorOrientation % 180 == 90
         val rotated = false
 
-        Log.e("rotated====","$rotated")
+        Log.e("rotated====", "$rotated")
         val multiplier: Float = 1.00f
         frameToCanvasMatrix = ImageUtils.getTransformationMatrix(
             300,
@@ -113,21 +113,20 @@ class Run(_context: Context) {
     }
 
 
-
-   // @Throws(java.lang.Exception::class)
-    fun get_xy( fullPath: String): FloatArray? {
-       val save_result = true
+    // @Throws(java.lang.Exception::class)
+    fun get_xy(fullPath: String): FloatArray? {
+        val save_result = true
         val canvas = Canvas(croppedBitmap!!)
-       val ori_canvas = Canvas(oriBitmap!!)
+        val ori_canvas = Canvas(oriBitmap!!)
 
 
-       ori_loadImage(fullPath)?.let {
-           ori_canvas.drawBitmap(
-               it,
-               ori_frameToCropTransform!!,
-               null
-           )
-       }
+        ori_loadImage(fullPath)?.let {
+            ori_canvas.drawBitmap(
+                it,
+                ori_frameToCropTransform!!,
+                null
+            )
+        }
 
 //       loadImage_inSampleSize(fullPath)?.let {
 //            canvas.drawBitmap(
@@ -138,18 +137,22 @@ class Run(_context: Context) {
 //        }
 
 
-       loadImage(fullPath)?.let {
-           canvas.drawBitmap(
-               it,
-               cropToFrameTransform!!,
-               null
-           )
-       }
+        loadImage(fullPath)?.let {
+            canvas.drawBitmap(
+                it,
+                cropToFrameTransform!!,
+                null
+            )
+        }
 
-       var full_arr2 = fullPath.split(".JPEG")
-       var chk_file_str2 = full_arr2[0]+"_step1.JPEG"
-       croppedBitmap!!.compress(Bitmap.CompressFormat.JPEG, 100,  FileOutputStream( File(chk_file_str2)));
-       Log.e("모델결과","파일저장: $chk_file_str2")
+        var full_arr2 = fullPath.split(".JPEG")
+        var chk_file_str2 = full_arr2[0] + "_step1.JPEG"
+        croppedBitmap!!.compress(
+            Bitmap.CompressFormat.JPEG,
+            100,
+            FileOutputStream(File(chk_file_str2))
+        );
+        Log.e("모델결과", "파일저장: $chk_file_str2")
 
         val results: List<Classifier.Recognition?>? = detector!!.recognizeImage(croppedBitmap)
 //        for (item in results!!) {
@@ -158,28 +161,28 @@ class Run(_context: Context) {
         var f_arr = FloatArray(2)
 
 
-       val paint = Paint()
-       paint.color = Color.RED
-       paint.style = Paint.Style.STROKE
-       paint.strokeWidth = 2.0f
-       ++timestamp
-       val currTimestamp: Long = timestamp
+        val paint = Paint()
+        paint.color = Color.RED
+        paint.style = Paint.Style.STROKE
+        paint.strokeWidth = 2.0f
+        ++timestamp
+        val currTimestamp: Long = timestamp
 
-        if (results!!.isNotEmpty()){
-           // Log.d("예측결과- results ",results.toString())
+        if (results!!.isNotEmpty()) {
+            // Log.d("예측결과- results ",results.toString())
 
-            if(save_result){
+            if (save_result) {
                 var mappedRecognitions = LinkedList<Recognition>()
                 var ori_mappedRecognitions = LinkedList<Recognition>()
                 val MINIMUM_CONFIDENCE_TF_OD_API = 0.1f
                 val minimumConfidence: Float =
                     MINIMUM_CONFIDENCE_TF_OD_API
                 for (result2 in results) {
-                    val result : Recognition = result2!!
+                    val result: Recognition = result2!!
                     val location = result!!.getLocation()
                     //Log.d("예측결과- all ",result.getConfidence_int().toString()+"% -"+result.getTitle()+"-"+result.getLocation())
                     val test = result.getConfidence()!! >= minimumConfidence
-                    if (location != null && test ) {
+                    if (location != null && test) {
 
                         val ori_result = result
 
@@ -190,20 +193,19 @@ class Run(_context: Context) {
                         canvas.drawRect(location, paint)
 
 
-
                         // 이게 다시 원래로 좌표로 인식크기 변환하는거니깐 일단 주석
                         val bbox = RectF()
-                        frameToCanvasMatrix!!.mapRect(bbox,location)
+                        frameToCanvasMatrix!!.mapRect(bbox, location)
                         ori_result.setLocation(bbox)
                         ori_mappedRecognitions.add(ori_result)
                         ori_canvas.drawRect(bbox, paint)
 
-                        Log.d("예측결과- location ",""+location.toString())
-                        Log.d("예측결과- bbox ",""+bbox.toString())
+                        Log.d("예측결과- location ", "" + location.toString())
+                        Log.d("예측결과- bbox ", "" + bbox.toString())
 
 
-                    }else{
-                      //  Log.d("예측결과- < minimumConfidence",""+result.getTitle()+"-"+result.getLocation())
+                    } else {
+                        //  Log.d("예측결과- < minimumConfidence",""+result.getTitle()+"-"+result.getLocation())
                     }
                 }
 
@@ -214,32 +216,40 @@ class Run(_context: Context) {
 
                 // canvas TO PNG
                 var full_arr = fullPath.split(".JPEG")
-                croppedBitmap!!.compress(Bitmap.CompressFormat.JPEG, 100,  FileOutputStream( File( full_arr[0]+"__cropped.JPEG")));
-                Log.e("모델결과","파일저장-확대에  그린것: "+full_arr[0]+"_cropped.JPEG")
+                croppedBitmap!!.compress(
+                    Bitmap.CompressFormat.JPEG,
+                    100,
+                    FileOutputStream(File(full_arr[0] + "__cropped.JPEG"))
+                );
+                Log.e("모델결과", "파일저장-확대에  그린것: " + full_arr[0] + "_cropped.JPEG")
 
                 ori_tracker!!.trackResults(ori_mappedRecognitions, currTimestamp)
                 ori_tracker!!.draw(ori_canvas)
 
-                oriBitmap!!.compress(Bitmap.CompressFormat.JPEG, 100,  FileOutputStream( File(full_arr[0]+"_ori.JPEG")));
-                Log.e("모델결과","파일저장-원본에 그린것: "+full_arr[0]+"_ori.JPEG")
+                oriBitmap!!.compress(
+                    Bitmap.CompressFormat.JPEG,
+                    100,
+                    FileOutputStream(File(full_arr[0] + "_ori.JPEG"))
+                );
+                Log.e("모델결과", "파일저장-원본에 그린것: " + full_arr[0] + "_ori.JPEG")
 
             }
             var max_item = results[0]
             var con = max_item?.getConfidence_int()!!
-            Log.d("모델결과-con: ","$con % ")
-            if(con < CONFIDENCE){
-                Log.d("모델결과-Confidence 너무낮아",max_item.toString())
-                Log.d("모델결과-Confidence 너무낮아","$con")
-                return  null
-            }else{
+            Log.d("모델결과-con: ", "$con % ")
+            if (con < CONFIDENCE) {
+                Log.d("모델결과-Confidence 너무낮아", max_item.toString())
+                Log.d("모델결과-Confidence 너무낮아", "$con")
+                return null
+            } else {
                 var x = max_item?.getLocation()?.centerX()
                 var y = max_item?.getLocation()?.centerY()
                 if (x != null && y != null) {
-                    f_arr.set(0,x)
-                    f_arr.set(1,y)
-                    Log.d("모델결과-max_item ",max_item.toString())
-                    Log.d("모델결과-x,y ",x.toString())
-                    Log.d("모델결과-x,y ",y.toString())
+                    f_arr.set(0, x)
+                    f_arr.set(1, y)
+                    Log.d("모델결과-max_item ", max_item.toString())
+                    Log.d("모델결과-x,y ", x.toString())
+                    Log.d("모델결과-x,y ", y.toString())
                     return f_arr
                 }
             }
@@ -270,7 +280,7 @@ class Run(_context: Context) {
 
     private fun loadImage(fileName: String): Bitmap? {
 
-        var fis   =  FileInputStream(fileName)
+        var fis = FileInputStream(fileName)
         var bitmap = BitmapFactory.decodeStream(fis)
         fis.close()
 
@@ -296,9 +306,10 @@ class Run(_context: Context) {
 //        val inputStream = assetManager.open(fileName)
         return bitmap
     }
+
     private fun ori_loadImage(fileName: String): Bitmap? {
 
-        var fis   =  FileInputStream(fileName)
+        var fis = FileInputStream(fileName)
         var bitmap = BitmapFactory.decodeStream(fis)
         fis.close()
 
@@ -308,6 +319,7 @@ class Run(_context: Context) {
 //        val inputStream = assetManager.open(fileName)
         return bitmap
     }
+
     // The format of result:
     // category bbox.left bbox.top bbox.right bbox.bottom confidence
     // ...
