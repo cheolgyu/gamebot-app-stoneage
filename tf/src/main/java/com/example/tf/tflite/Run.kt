@@ -67,11 +67,8 @@ class Run(_context: Context) {
             IS_MODEL_QUANTIZED
         )
         val cropSize: Int = MODEL_INPUT_SIZE
-        //val previewWidth: Int = IMAGE_SIZE.getWidth()
-        //val previewHeight: Int = IMAGE_SIZE.getHeight()
         val sensorOrientation = 0
         croppedBitmap = Bitmap.createBitmap(cropSize, cropSize, Bitmap.Config.ARGB_8888)
-        var utils = ImageUtils()
 
 
         ori_frameToCropTransform = Matrix()
@@ -93,14 +90,9 @@ class Run(_context: Context) {
             sensorOrientation,
             true
         )
-        //frameToCropTransform?.invert(cropToFrameTransform)
 
-
-        //val rotated = sensorOrientation % 180 == 90
         val rotated = false
 
-        Log.e("rotated====", "$rotated")
-        val multiplier: Float = 1.00f
         frameToCanvasMatrix = ImageUtils.getTransformationMatrix(
             300,
             300,
@@ -128,15 +120,6 @@ class Run(_context: Context) {
             )
         }
 
-//       loadImage_inSampleSize(fullPath)?.let {
-//            canvas.drawBitmap(
-//                it,
-//                Matrix(),
-//                null
-//            )
-//        }
-
-
         loadImage(fullPath)?.let {
             canvas.drawBitmap(
                 it,
@@ -155,9 +138,7 @@ class Run(_context: Context) {
         Log.e("모델결과", "파일저장: $chk_file_str2")
 
         val results: List<Classifier.Recognition?>? = detector!!.recognizeImage(croppedBitmap)
-//        for (item in results!!) {
-//            Log.d("모델결과",item.toString())
-//        }
+
         var f_arr = FloatArray(2)
 
 
@@ -170,11 +151,11 @@ class Run(_context: Context) {
 
         if (results!!.isNotEmpty()) {
             // Log.d("예측결과- results ",results.toString())
-
             if (save_result) {
+
                 var mappedRecognitions = LinkedList<Recognition>()
                 var ori_mappedRecognitions = LinkedList<Recognition>()
-                val MINIMUM_CONFIDENCE_TF_OD_API = 0.1f
+                val MINIMUM_CONFIDENCE_TF_OD_API = 0.8f
                 val minimumConfidence: Float =
                     MINIMUM_CONFIDENCE_TF_OD_API
                 for (result2 in results) {
@@ -204,8 +185,6 @@ class Run(_context: Context) {
                         Log.d("예측결과- bbox ", "" + bbox.toString())
 
 
-                    } else {
-                        //  Log.d("예측결과- < minimumConfidence",""+result.getTitle()+"-"+result.getLocation())
                     }
                 }
 
@@ -242,8 +221,10 @@ class Run(_context: Context) {
                 Log.d("모델결과-Confidence 너무낮아", "$con")
                 return null
             } else {
-                var x = max_item?.getLocation()?.centerX()
-                var y = max_item?.getLocation()?.centerY()
+                val bbox = RectF()
+                frameToCanvasMatrix!!.mapRect(bbox, max_item.getLocation())
+                var x = bbox.centerX()
+                var y = bbox.centerY()
                 if (x != null && y != null) {
                     f_arr.set(0, x)
                     f_arr.set(1, y)
@@ -291,21 +272,6 @@ class Run(_context: Context) {
         return bitmap
     }
 
-    //@Throws(Exception::class)
-    private fun loadImage_inSampleSize(fileName: String): Bitmap? {
-        val options = BitmapFactory.Options()
-        options.inSampleSize = 6
-        val bitmap = BitmapFactory.decodeFile(fileName, options)
-//        var fis   =  FileInputStream(fileName)
-//        var bitmap = BitmapFactory.decodeStream(fis)
-//        fis.close()
-
-//        val assetManager: AssetManager =
-//            context
-//                .getAssets()
-//        val inputStream = assetManager.open(fileName)
-        return bitmap
-    }
 
     private fun ori_loadImage(fileName: String): Bitmap? {
 
