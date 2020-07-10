@@ -16,6 +16,7 @@ import java.util.*
 
 class Run(_context: Context) {
     private var tracker: MultiBoxTracker? = null
+    private var ori_tracker: MultiBoxTracker? = null
     protected var previewWidth = 0
     protected var previewHeight = 0
     private var sensorOrientation: Int? = null
@@ -24,7 +25,7 @@ class Run(_context: Context) {
     private val CONFIDENCE = 50
     private val MODEL_INPUT_SIZE = 300
     private val IS_MODEL_QUANTIZED = false
-    private val MODEL_FILE = "stoneage_v_1.tflite"
+    private val MODEL_FILE = "stoneage_v_2.tflite"
     private val LABELS_FILE = "file:///android_asset/stoneage.txt"
     private val IMAGE_SIZE = Size(1080, 1794)
 
@@ -34,11 +35,17 @@ class Run(_context: Context) {
     private var frameToCropTransform: Matrix? = null
     private var ori_frameToCropTransform: Matrix? = null
     private var cropToFrameTransform: Matrix? = null
+    var frameToCanvasMatrix : Matrix? = null
     var context: Context = _context
 
-    fun build() {
-        previewWidth = 1794
-        previewHeight = 1080
+    fun build( fullPath : String) {
+
+        var bitmap=  loadImage(fullPath)
+
+        previewWidth = bitmap!!.width
+        previewHeight = bitmap!!.height
+
+        Log.e("run.kt","previewWidth=$previewWidth, previewHeight=$previewHeight")
 
         //이값 수정해야대. 복붙한값 디바이스에따라 달라짐.
         sensorOrientation = 90
@@ -46,6 +53,9 @@ class Run(_context: Context) {
 
         tracker = MultiBoxTracker(context)
         tracker!!.setFrameConfiguration(previewWidth, previewHeight, sensorOrientation!!)
+
+        ori_tracker = MultiBoxTracker(context)
+        ori_tracker!!.setFrameConfiguration(previewWidth, previewHeight, sensorOrientation!!)
 
         val assetManager: AssetManager =
             context.getAssets()
@@ -62,6 +72,10 @@ class Run(_context: Context) {
         val sensorOrientation = 0
         croppedBitmap = Bitmap.createBitmap(cropSize, cropSize, Bitmap.Config.ARGB_8888)
         var utils = ImageUtils()
+
+
+        ori_frameToCropTransform = Matrix()
+
         frameToCropTransform = ImageUtils.Companion.getTransformationMatrix(
             previewWidth,
             previewHeight,
@@ -71,17 +85,30 @@ class Run(_context: Context) {
             true
         )
 
-        ori_frameToCropTransform = ImageUtils.Companion.getTransformationMatrix(
+        cropToFrameTransform =  ImageUtils.Companion.getTransformationMatrix(
             previewWidth,
             previewHeight,
+            cropSize,
+            cropSize,
+            sensorOrientation,
+            true
+        )
+            //frameToCropTransform?.invert(cropToFrameTransform)
+
+
+        //val rotated = sensorOrientation % 180 == 90
+        val rotated = false
+
+        Log.e("rotated====","$rotated")
+        val multiplier: Float = 1.00f
+        frameToCanvasMatrix = ImageUtils.getTransformationMatrix(
+            300,
+            300,
             previewWidth,
             previewHeight,
             sensorOrientation,
             false
         )
-
-        cropToFrameTransform = Matrix()
-        frameToCropTransform?.invert(cropToFrameTransform)
 
     }
 
@@ -97,21 +124,30 @@ class Run(_context: Context) {
        ori_loadImage(fullPath)?.let {
            ori_canvas.drawBitmap(
                it,
-               Matrix(),
+               ori_frameToCropTransform!!,
                null
            )
        }
 
-        loadImage(fullPath)?.let {
-            canvas.drawBitmap(
-                it,
-                Matrix(),
-                null
-            )
-        }
+//       loadImage_inSampleSize(fullPath)?.let {
+//            canvas.drawBitmap(
+//                it,
+//                Matrix(),
+//                null
+//            )
+//        }
+
+
+       loadImage(fullPath)?.let {
+           canvas.drawBitmap(
+               it,
+               cropToFrameTransform!!,
+               null
+           )
+       }
 
        var full_arr2 = fullPath.split(".JPEG")
-       var chk_file_str2 = full_arr2[0]+"_frameToCropTransform.JPEG"
+       var chk_file_str2 = full_arr2[0]+"_step1.JPEG"
        croppedBitmap!!.compress(Bitmap.CompressFormat.JPEG, 100,  FileOutputStream( File(chk_file_str2)));
        Log.e("모델결과","파일저장: $chk_file_str2")
 
@@ -130,40 +166,62 @@ class Run(_context: Context) {
        val currTimestamp: Long = timestamp
 
         if (results!!.isNotEmpty()){
-            Log.d("예측결과- results ",results.toString())
+           // Log.d("예측결과- results ",results.toString())
 
             if(save_result){
                 var mappedRecognitions = LinkedList<Recognition>()
+                var ori_mappedRecognitions = LinkedList<Recognition>()
                 val MINIMUM_CONFIDENCE_TF_OD_API = 0.1f
                 val minimumConfidence: Float =
                     MINIMUM_CONFIDENCE_TF_OD_API
                 for (result2 in results) {
                     val result : Recognition = result2!!
                     val location = result!!.getLocation()
-                    Log.d("예측결과- all ",result.getConfidence_int().toString()+"% -"+result.getTitle()+"-"+result.getLocation())
+                    //Log.d("예측결과- all ",result.getConfidence_int().toString()+"% -"+result.getTitle()+"-"+result.getLocation())
                     val test = result.getConfidence()!! >= minimumConfidence
-                    if (location != null && result.getTitle()=="skip" ) {
+                    if (location != null && test ) {
 
-                       // cropToFrameTransform!!.mapRect(location)
+                        val ori_result = result
+
+
+
                         result.setLocation(location)
                         mappedRecognitions.add(result)
                         canvas.drawRect(location, paint)
 
+
+
+                        // 이게 다시 원래로 좌표로 인식크기 변환하는거니깐 일단 주석
+                        val bbox = RectF()
+                        frameToCanvasMatrix!!.mapRect(bbox,location)
+                        ori_result.setLocation(bbox)
+                        ori_mappedRecognitions.add(ori_result)
+                        ori_canvas.drawRect(bbox, paint)
+
+                        Log.d("예측결과- location ",""+location.toString())
+                        Log.d("예측결과- bbox ",""+bbox.toString())
+
+
                     }else{
-                        Log.d("예측결과- < minimumConfidence",""+result.getTitle()+"-"+result.getLocation())
+                      //  Log.d("예측결과- < minimumConfidence",""+result.getTitle()+"-"+result.getLocation())
                     }
                 }
 
                 // 캔버스에 이름 작성
                 tracker!!.trackResults(mappedRecognitions, currTimestamp)
                 tracker!!.draw(canvas)
+
+
                 // canvas TO PNG
                 var full_arr = fullPath.split(".JPEG")
-                croppedBitmap!!.compress(Bitmap.CompressFormat.JPEG, 100,  FileOutputStream( File( full_arr[0]+"_chk_cropped.JPEG")));
-                Log.e("모델결과","파일저장: "+full_arr[0]+"_chk_cropped.JPEG")
+                croppedBitmap!!.compress(Bitmap.CompressFormat.JPEG, 100,  FileOutputStream( File( full_arr[0]+"__cropped.JPEG")));
+                Log.e("모델결과","파일저장-확대에  그린것: "+full_arr[0]+"_cropped.JPEG")
 
-                oriBitmap!!.compress(Bitmap.CompressFormat.JPEG, 100,  FileOutputStream( File(full_arr[0]+"_chk.JPEG")));
-                Log.e("모델결과","파일저장: "+full_arr[0]+"_chk.JPEG")
+                ori_tracker!!.trackResults(ori_mappedRecognitions, currTimestamp)
+                ori_tracker!!.draw(ori_canvas)
+
+                oriBitmap!!.compress(Bitmap.CompressFormat.JPEG, 100,  FileOutputStream( File(full_arr[0]+"_ori.JPEG")));
+                Log.e("모델결과","파일저장-원본에 그린것: "+full_arr[0]+"_ori.JPEG")
 
             }
             var max_item = results[0]
@@ -210,9 +268,21 @@ class Run(_context: Context) {
     }
 
 
+    private fun loadImage(fileName: String): Bitmap? {
+
+        var fis   =  FileInputStream(fileName)
+        var bitmap = BitmapFactory.decodeStream(fis)
+        fis.close()
+
+//        val assetManager: AssetManager =
+//            context
+//                .getAssets()
+//        val inputStream = assetManager.open(fileName)
+        return bitmap
+    }
 
     //@Throws(Exception::class)
-    private fun loadImage(fileName: String): Bitmap? {
+    private fun loadImage_inSampleSize(fileName: String): Bitmap? {
         val options = BitmapFactory.Options()
         options.inSampleSize = 6
         val bitmap = BitmapFactory.decodeFile(fileName, options)

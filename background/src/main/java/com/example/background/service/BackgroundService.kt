@@ -118,7 +118,7 @@ class BackgroundService : Service() {
                             )
                             var full_path = image_available()
 
-                            if (full_path != null) {
+                            if (full_path != null && full_path != ""  ) {
                                 var arr : FloatArray? =  tflite_run(full_path)
                                 if(arr != null){
                                     var x = arr.get(0)
@@ -221,9 +221,9 @@ class BackgroundService : Service() {
     }
 
     fun tflite_run(full_path:String): FloatArray? {
-        Log.d(TAG, "res=====================================tflite_run")
+        Log.d(TAG, "res=====================================tflite_run====full_path==$full_path")
         var run = com.example.tf.tflite.Run(this)
-        run.build()
+        run.build(full_path)
         var res = run.get_xy(full_path)
 
         //return null
