@@ -48,7 +48,7 @@ class BackgroundService : Service() {
             Intent(_context, BackgroundService::class.java).apply {
                 my_action = _action
                 context = _context
-                if (_action == "start" ) {
+                if (_action == "start") {
                     RUN_BACKGROUND = true
                 } else if (_action == "stop") {
                     RUN_BACKGROUND = false
@@ -69,7 +69,7 @@ class BackgroundService : Service() {
 
     override fun onCreate() {
         Log.e(TAG, "--------------BackgroundService --------onCreate----------------------")
-        if(RUN_BACKGROUND){
+        if (RUN_BACKGROUND) {
             run_notify()
             ready_media()
         }
@@ -90,72 +90,72 @@ class BackgroundService : Service() {
             "--------------BackgroundService --------onStartCommand---------RUN_BACKGROUND=$RUN_BACKGROUND,action=$my_action"
         )
         if (RUN_BACKGROUND) {
-                //
-                /*
+            //
+            /*
 
-                백그라운드 서비스 에서 이미지리더 생성후
-                var img = imageReader.acquireLatestImage() 로 이미지 가져오고
-                tflite로 좌표구하고
-                구한결과 접근성.터치 로 실행.
+            백그라운드 서비스 에서 이미지리더 생성후
+            var img = imageReader.acquireLatestImage() 로 이미지 가져오고
+            tflite로 좌표구하고
+            구한결과 접근성.터치 로 실행.
 
-                 */
+             */
 
-                make_image_reader()
+            make_image_reader()
 
-                BackgroundServiceMP(
-                    context!!,
-                    mediaProjectionManager,
-                    windowManager.defaultDisplay,
-                    imageReader!!,
-                    mRotation!!
-                ).createVirtualDisplay()
+            BackgroundServiceMP(
+                context!!,
+                mediaProjectionManager,
+                windowManager.defaultDisplay,
+                imageReader!!,
+                mRotation!!
+            ).createVirtualDisplay()
 
-                // start capture handling thread
-                object : Thread() {
-                    override fun run() {
-                        while (RUN_BACKGROUND){
-                            Thread.sleep(1000)
-                            Log.e(
-                                "쓰레드",
-                                "--------------------------------------------"
-                            )
+            // start capture handling thread
+            object : Thread() {
+                override fun run() {
+                    while (RUN_BACKGROUND) {
+                        Thread.sleep(1000)
+                        Log.e(
+                            "쓰레드",
+                            "--------------------------------------------"
+                        )
 //                            val so = getScreenOrientation()
 //                            if(so == 90 || so ==270){
 //                                val tmp = mWidth
 //                                mWidth = mHeight
 //                                mHeight = tmp
 //                            }
-                            Log.e(
-                                "쓰레드",
-                                "-------------------mWidth=$mWidth--mHeight=$mHeight-----------------------"
-                            )
-                            var full_path = image_available()
+                        Log.e(
+                            "쓰레드",
+                            "-------------------mWidth=$mWidth--mHeight=$mHeight-----------------------"
+                        )
+                        var full_path = image_available()
 
-                            if (full_path != null && full_path != ""  ) {
-                                var arr : FloatArray? =  tflite_run(full_path)
-                                if(arr != null){
-                                    var x = arr.get(0)
-                                    var y = arr.get(1)
-                                    Log.e(
-                                        "쓰레드",
-                                        "--------------$x---$y---------------------------"
-                                    )
-                                    touchService!!.click(x,y)
-                                }else{
-                                    Log.e(
-                                        "쓰레드",
-                                        "tflite_run return null "
-                                    )
-                                }
-                            }else{
+                        if (full_path != null && full_path != "") {
+                            var arr: FloatArray? = tflite_run(full_path)
+                            if (arr != null) {
+                                var x = arr.get(0)
+                                var y = arr.get(1)
                                 Log.e(
                                     "쓰레드",
-                                    "image_available null "
+                                    "--------------$x---$y---------------------------"
+                                )
+                                touchService!!.click(x, y)
+                            } else {
+                                Log.e(
+                                    "쓰레드",
+                                    "tflite_run return null "
                                 )
                             }
+                        } else {
+                            Log.e(
+                                "쓰레드",
+                                "image_available null "
+                            )
                         }
                     }
-                }.start()
+                }
+            }.start()
 
             Toast.makeText(this, "service starting~~~~~~~``", Toast.LENGTH_SHORT).show()
         } else {
@@ -189,7 +189,7 @@ class BackgroundService : Service() {
 
             // write bitmap to a file
             val file_id = SystemClock.uptimeMillis()
-            var my_file = STORE_DIRECTORY  + file_id + ".JPEG"
+            var my_file = STORE_DIRECTORY + file_id + ".JPEG"
             fos =
                 FileOutputStream(my_file)
 
@@ -220,8 +220,8 @@ class BackgroundService : Service() {
         // get width and height
         val size = Point()
         display!!.getSize(size)
-         mWidth = size.x
-         mHeight = size.y
+        mWidth = size.x
+        mHeight = size.y
 
         // start capture reader
         imageReader = ImageReader.newInstance(
@@ -232,7 +232,7 @@ class BackgroundService : Service() {
         )
     }
 
-     fun getScreenOrientation(): Int {
+    fun getScreenOrientation(): Int {
         return when (windowManager.getDefaultDisplay().getRotation()) {
             Surface.ROTATION_270 -> 270
             Surface.ROTATION_180 -> 180
@@ -241,11 +241,11 @@ class BackgroundService : Service() {
         }
     }
 
-    fun tflite_run(full_path:String): FloatArray? {
+    fun tflite_run(full_path: String): FloatArray? {
         val so = getScreenOrientation()
 
         Log.d(TAG, "full_path=$full_path, getScreenOrientation=$so, ")
-        var run = com.example.tf.tflite.Run(this,so)
+        var run = com.example.tf.tflite.Run(this, so)
         run.build(full_path)
         var res = run.get_xy(full_path)
 
@@ -277,7 +277,7 @@ class BackgroundService : Service() {
         //생성
 
         //권환얻기=> 는 액티비티
-       // startActivity(com.example.background.MediaProjectionActivity.newInstance(context!!))
+        // startActivity(com.example.background.MediaProjectionActivity.newInstance(context!!))
         Log.e(
             TAG,
             "--------------BackgroundService --------my_media----------------------RUN_BACKGROUND=" + RUN_BACKGROUND

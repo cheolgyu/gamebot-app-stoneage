@@ -35,12 +35,13 @@ class BackgroundServiceMP(
     val VIRTUAL_DISPLAY_FLAGS =
         DisplayManager.VIRTUAL_DISPLAY_FLAG_OWN_CONTENT_ONLY or DisplayManager.VIRTUAL_DISPLAY_FLAG_PUBLIC
     var mHandler: Handler? = null
-    var virtualDisplay :  VirtualDisplay? = null
-    var mediaProjection : MediaProjection? =null
+    var virtualDisplay: VirtualDisplay? = null
+    var mediaProjection: MediaProjection? = null
+
     @SuppressLint("WrongConstant")
     fun createVirtualDisplay() {
 
-         mediaProjection =
+        mediaProjection =
             mediaProjectionManager.getMediaProjection(
                 my_resultCode!!,
                 my_data!!
@@ -80,7 +81,7 @@ class BackgroundServiceMP(
 //            2
 //        )
 
-     virtualDisplay = get_virtualDisplay()!!
+        virtualDisplay = get_virtualDisplay()!!
 
         var mHandler2: Handler? = null
         // start capture handling thread
@@ -146,7 +147,7 @@ class BackgroundServiceMP(
 
                 }
                 if (imageReader != null) {
-                   // imageReader.setOnImageAvailableListener(null, null)
+                    // imageReader.setOnImageAvailableListener(null, null)
                     make_image_reader()
 
                 }
@@ -154,7 +155,7 @@ class BackgroundServiceMP(
                     get_virtualDisplay()
 
                 }
-            }else{
+            } else {
 
             }
         }
