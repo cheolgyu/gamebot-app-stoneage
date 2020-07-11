@@ -33,11 +33,12 @@ class TouchService : AccessibilityService() {
         lp.flags = lp.flags or WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE
         lp.width = WindowManager.LayoutParams.WRAP_CONTENT
         lp.height = WindowManager.LayoutParams.WRAP_CONTENT
-        lp.gravity = Gravity.TOP
+        lp.gravity = Gravity.LEFT
         val inflater = LayoutInflater.from(this)
 
         inflater.inflate(R.layout.action_bar, mLayout)
         wm.addView(mLayout, lp)
+
 
         configure()
 
@@ -45,7 +46,6 @@ class TouchService : AccessibilityService() {
     }
 
     fun configure(){
-        configureSwipeButton()
         configureStopButton()
         configureStartButton()
     }
@@ -56,20 +56,6 @@ class TouchService : AccessibilityService() {
         val gestureBuilder = GestureDescription.Builder()
         gestureBuilder.addStroke(StrokeDescription(clickPath, 0, 1000))
         dispatchGesture(gestureBuilder.build(), null, null)
-    }
-
-    private fun configureSwipeButton() {
-        val swipeButton: Button = mLayout!!.findViewById<View>(R.id.swipe) as Button
-        swipeButton.setOnClickListener(object : View.OnClickListener {
-            override fun onClick(view: View?) {
-                val swipePath = Path()
-                swipePath.moveTo(1000F, 1000F)
-                swipePath.lineTo(100F, 1000F)
-                val gestureBuilder = GestureDescription.Builder()
-                gestureBuilder.addStroke(StrokeDescription(swipePath, 0, 500))
-                dispatchGesture(gestureBuilder.build(), null, null)
-            }
-        })
     }
 
     private fun configureStartButton() {

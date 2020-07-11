@@ -1,25 +1,32 @@
 package com.example.background.service
 
 import android.annotation.SuppressLint
+import android.content.Context
+import android.graphics.PixelFormat
 import android.graphics.Point
 import android.hardware.display.DisplayManager
+import android.hardware.display.VirtualDisplay
 import android.media.ImageReader
+import android.media.projection.MediaProjection
 import android.media.projection.MediaProjectionManager
 import android.os.Handler
 import android.os.Looper
 import android.util.DisplayMetrics
 import android.util.Log
 import android.view.Display
+import android.view.OrientationEventListener
+import android.view.WindowManager
 
 
 class BackgroundServiceMP(
+    val context: Context,
     val mediaProjectionManager: MediaProjectionManager,
     val display: Display,
     val imageReader: ImageReader,
-    val STORE_DIRECTORY: String
+    var mRotation: Int
 ) {
 
-
+    var mProjectionStopped = true
     val TAG: String = ""
     var mDensity = 0
     var mWidth = 100
@@ -28,11 +35,12 @@ class BackgroundServiceMP(
     val VIRTUAL_DISPLAY_FLAGS =
         DisplayManager.VIRTUAL_DISPLAY_FLAG_OWN_CONTENT_ONLY or DisplayManager.VIRTUAL_DISPLAY_FLAG_PUBLIC
     var mHandler: Handler? = null
-
+    var virtualDisplay :  VirtualDisplay? = null
+    var mediaProjection : MediaProjection? =null
     @SuppressLint("WrongConstant")
     fun createVirtualDisplay() {
 
-        var mediaProjection =
+         mediaProjection =
             mediaProjectionManager.getMediaProjection(
                 my_resultCode!!,
                 my_data!!
@@ -72,17 +80,9 @@ class BackgroundServiceMP(
 //            2
 //        )
 
-        mediaProjection.createVirtualDisplay(
-            SCREENCAP_NAME,
-            mWidth,
-            mHeight,
-            mDensity,
-            VIRTUAL_DISPLAY_FLAGS,
-            imageReader.getSurface(),
-            null,
-            mHandler
-        )
-        var mHandler2 : Handler? =null
+     virtualDisplay = get_virtualDisplay()!!
+
+        var mHandler2: Handler? = null
         // start capture handling thread
 //        object : Thread() {
 //            override fun run() {
@@ -106,7 +106,81 @@ class BackgroundServiceMP(
 //                STORE_DIRECTORY
 //            ), null
 //        )
-        Log.d(TAG, "22222222222222222222222222222222222")
+        mProjectionStopped = false
 
+        val orientationChangeCallback = OrientationChangeCallback()
+        if (orientationChangeCallback.canDetectOrientation()) {
+            orientationChangeCallback.enable();
+        }
+
+
+    }
+
+    fun get_virtualDisplay(): VirtualDisplay? {
+
+        return mediaProjection!!.createVirtualDisplay(
+            SCREENCAP_NAME,
+            mWidth,
+            mHeight,
+            mDensity,
+            VIRTUAL_DISPLAY_FLAGS,
+            imageReader.getSurface(),
+            null,
+            mHandler
+        )
+    }
+
+    private inner class OrientationChangeCallback internal constructor(
+
+    ) :
+        OrientationEventListener(context) {
+        override fun onOrientationChanged(orientation: Int) {
+
+            val rotation: Int = display.getRotation();
+
+            if (rotation != mRotation) {
+
+                mRotation = rotation
+                if (virtualDisplay != null) {
+                    virtualDisplay!!.release()
+
+                }
+                if (imageReader != null) {
+                   // imageReader.setOnImageAvailableListener(null, null)
+                    make_image_reader()
+
+                }
+                if (!mProjectionStopped) {
+                    get_virtualDisplay()
+
+                }
+            }else{
+
+            }
+        }
+
+        @SuppressLint("WrongConstant")
+        fun make_image_reader() {
+
+            // display metrics
+            val metrics = DisplayMetrics()
+            var wm = context.getSystemService(Context.WINDOW_SERVICE) as WindowManager
+            display!!.getMetrics(metrics)
+            BackgroundService.mRotation = wm.getDefaultDisplay().getRotation()
+            // get width and height
+            val size = Point()
+            display!!.getSize(size)
+            BackgroundService.mWidth = size.x
+            BackgroundService.mHeight = size.y
+            var aa = size.toString()
+
+            // start capture reader
+            BackgroundService.imageReader = ImageReader.newInstance(
+                BackgroundService.mWidth!!,
+                BackgroundService.mHeight!!,
+                PixelFormat.RGBA_8888,
+                2
+            )
+        }
     }
 }
