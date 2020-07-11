@@ -14,7 +14,7 @@ import java.io.FileOutputStream
 import java.util.*
 
 
-class Run(_context: Context) {
+class Run(val context: Context,val rotation: Int) {
     private var tracker: MultiBoxTracker? = null
     private var ori_tracker: MultiBoxTracker? = null
     protected var previewWidth = 0
@@ -36,7 +36,6 @@ class Run(_context: Context) {
     private var ori_frameToCropTransform: Matrix? = null
     private var cropToFrameTransform: Matrix? = null
     var frameToCanvasMatrix: Matrix? = null
-    var context: Context = _context
 
     fun build(fullPath: String) {
 
@@ -45,10 +44,10 @@ class Run(_context: Context) {
         previewWidth = bitmap!!.width
         previewHeight = bitmap!!.height
 
-        Log.e("run.kt", "previewWidth=$previewWidth, previewHeight=$previewHeight")
+        Log.e("run.kt", "rotation=$rotation,previewWidth=$previewWidth, previewHeight=$previewHeight")
 
-        //이값 수정해야대. 복붙한값 디바이스에따라 달라짐.
-        sensorOrientation = 90
+        // 90,270 이 가로
+        sensorOrientation = rotation
         oriBitmap = Bitmap.createBitmap(previewWidth, previewHeight, Bitmap.Config.ARGB_8888)
 
         tracker = MultiBoxTracker(context)
@@ -67,38 +66,36 @@ class Run(_context: Context) {
             IS_MODEL_QUANTIZED
         )
         val cropSize: Int = MODEL_INPUT_SIZE
-        val sensorOrientation = 0
+
         croppedBitmap = Bitmap.createBitmap(cropSize, cropSize, Bitmap.Config.ARGB_8888)
 
 
         ori_frameToCropTransform = Matrix()
 
-        frameToCropTransform = ImageUtils.Companion.getTransformationMatrix(
+        frameToCropTransform = ImageUtils.getTransformationMatrix(
             previewWidth,
             previewHeight,
             cropSize,
             cropSize,
-            sensorOrientation,
-            true
+            sensorOrientation!!,
+            false
         )
 
-        cropToFrameTransform = ImageUtils.Companion.getTransformationMatrix(
+        cropToFrameTransform = ImageUtils.getTransformationMatrix(
             previewWidth,
             previewHeight,
             cropSize,
             cropSize,
-            sensorOrientation,
-            true
+            sensorOrientation!!,
+            false
         )
-
-        val rotated = false
 
         frameToCanvasMatrix = ImageUtils.getTransformationMatrix(
-            300,
-            300,
+            cropSize,
+            cropSize,
             previewWidth,
             previewHeight,
-            sensorOrientation,
+            sensorOrientation!!,
             false
         )
 
@@ -231,6 +228,9 @@ class Run(_context: Context) {
                     Log.d("모델결과-max_item ", max_item.toString())
                     Log.d("모델결과-x,y ", x.toString())
                     Log.d("모델결과-x,y ", y.toString())
+                    if(x <0 || y < 0){
+                        return null
+                    }
                     return f_arr
                 }
             }

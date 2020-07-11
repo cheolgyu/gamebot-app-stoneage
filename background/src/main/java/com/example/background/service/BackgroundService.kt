@@ -16,6 +16,7 @@ import android.os.IBinder
 import android.os.SystemClock
 import android.util.DisplayMetrics
 import android.util.Log
+import android.view.Surface
 import android.view.WindowManager
 import android.widget.Toast
 import com.example.background.notification.Noti
@@ -33,7 +34,7 @@ class BackgroundService : Service() {
         var imageReader: ImageReader? = null
         var mWidth: Int? = null
         var mHeight: Int? = null
-
+        var mRotation: Int? = null
         private val FOREGROUND_SERVICE_ID = 1000
         private var cap_filename: String? = null
 
@@ -63,6 +64,7 @@ class BackgroundService : Service() {
                 //cap_bitmap = bitmap
                 RUN_BACKGROUND = true
             }
+
     }
 
     override fun onCreate() {
@@ -101,10 +103,11 @@ class BackgroundService : Service() {
                 make_image_reader()
 
                 BackgroundServiceMP(
+                    context!!,
                     mediaProjectionManager,
                     windowManager.defaultDisplay,
                     imageReader!!,
-                    STORE_DIRECTORY!!
+                    mRotation!!
                 ).createVirtualDisplay()
 
                 // start capture handling thread
@@ -115,6 +118,16 @@ class BackgroundService : Service() {
                             Log.e(
                                 "쓰레드",
                                 "--------------------------------------------"
+                            )
+//                            val so = getScreenOrientation()
+//                            if(so == 90 || so ==270){
+//                                val tmp = mWidth
+//                                mWidth = mHeight
+//                                mHeight = tmp
+//                            }
+                            Log.e(
+                                "쓰레드",
+                                "-------------------mWidth=$mWidth--mHeight=$mHeight-----------------------"
                             )
                             var full_path = image_available()
 
@@ -153,11 +166,11 @@ class BackgroundService : Service() {
         return START_STICKY
     }
 
+
     fun image_available(): String? {
         var image = imageReader!!.acquireLatestImage()
         if (image != null) {
             var fos: FileOutputStream? = null
-            var IMAGES_PRODUCED = 0
             val planes: Array<Image.Plane> = image.getPlanes()
             val buffer: ByteBuffer = planes[0].getBuffer()
             val pixelStride: Int = planes[0].getPixelStride()
@@ -182,7 +195,6 @@ class BackgroundService : Service() {
 
             bitmap.compress(Bitmap.CompressFormat.JPEG, 100, fos)
 
-            IMAGES_PRODUCED++
             Log.e(
                 ContentValues.TAG,
                 "captured image: " + my_file
@@ -204,7 +216,7 @@ class BackgroundService : Service() {
         val metrics = DisplayMetrics()
         var display = windowManager.defaultDisplay
         display!!.getMetrics(metrics)
-
+        mRotation = getScreenOrientation()
         // get width and height
         val size = Point()
         display!!.getSize(size)
@@ -220,9 +232,20 @@ class BackgroundService : Service() {
         )
     }
 
+     fun getScreenOrientation(): Int {
+        return when (windowManager.getDefaultDisplay().getRotation()) {
+            Surface.ROTATION_270 -> 270
+            Surface.ROTATION_180 -> 180
+            Surface.ROTATION_90 -> 90
+            else -> 0
+        }
+    }
+
     fun tflite_run(full_path:String): FloatArray? {
-        Log.d(TAG, "res=====================================tflite_run====full_path==$full_path")
-        var run = com.example.tf.tflite.Run(this)
+        val so = getScreenOrientation()
+
+        Log.d(TAG, "full_path=$full_path, getScreenOrientation=$so, ")
+        var run = com.example.tf.tflite.Run(this,so)
         run.build(full_path)
         var res = run.get_xy(full_path)
 
