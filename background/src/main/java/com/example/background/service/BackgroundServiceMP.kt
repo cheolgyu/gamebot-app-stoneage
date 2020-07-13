@@ -22,15 +22,12 @@ class BackgroundServiceMP(
     val context: Context,
     val mediaProjectionManager: MediaProjectionManager,
     val display: Display,
-    val imageReader: ImageReader,
     var mRotation: Int
 ) {
 
     var mProjectionStopped = true
     val TAG: String = ""
     var mDensity = 0
-    var mWidth = 100
-    var mHeight = 100
     val SCREENCAP_NAME = "screencap"
     val VIRTUAL_DISPLAY_FLAGS =
         DisplayManager.VIRTUAL_DISPLAY_FLAG_OWN_CONTENT_ONLY or DisplayManager.VIRTUAL_DISPLAY_FLAG_PUBLIC
@@ -69,8 +66,8 @@ class BackgroundServiceMP(
         // get width and height
         val size = Point()
         display.getSize(size)
-        mWidth = size.x
-        mHeight = size.y
+        BackgroundService.mWidth = size.x
+        BackgroundService.mHeight = size.y
 
 //
 //        // start capture reader
@@ -98,8 +95,8 @@ class BackgroundServiceMP(
 //            var img = imageReader.acquireLatestImage()
 //            Log.e("test",img.toString())
 //        }
-
-
+       // var imgListener = ImageAvailableListener()
+        //BackgroundService.imageReader.setOnImageAvailableListener(imgListener)
 //        imageReader.setOnImageAvailableListener(
 //            BackgroundServiceMPListener(
 //                mWidth,
@@ -121,42 +118,45 @@ class BackgroundServiceMP(
 
         return mediaProjection!!.createVirtualDisplay(
             SCREENCAP_NAME,
-            mWidth,
-            mHeight,
+            BackgroundService.mWidth!!,
+            BackgroundService.mHeight!!,
             mDensity,
             VIRTUAL_DISPLAY_FLAGS,
-            imageReader.getSurface(),
+            BackgroundService.imageReader!!.getSurface(),
             null,
             mHandler
         )
     }
 
-    private inner class OrientationChangeCallback internal constructor(
+    inner class OrientationChangeCallback internal constructor(
 
     ) :
         OrientationEventListener(context) {
         override fun onOrientationChanged(orientation: Int) {
 
             val rotation: Int = display.getRotation();
-
+            Log.d("onOrientationChanged","시작 mRotation=$mRotation,rotation=$rotation")
             if (rotation != mRotation) {
 
-                mRotation = rotation
+                Log.d("onOrientationChanged","시작-1")
+                //mRotation = rotation
                 if (virtualDisplay != null) {
                     virtualDisplay!!.release()
-
+                    Log.d("onOrientationChanged","시작-12")
                 }
-                if (imageReader != null) {
-                    // imageReader.setOnImageAvailableListener(null, null)
-                    make_image_reader()
-
+                if (BackgroundService.imageReader != null) {
+                    BackgroundService.imageReader!!.setOnImageAvailableListener(null, null)
+                    //
+                    Log.d("onOrientationChanged","시작-13")
                 }
                 if (!mProjectionStopped) {
-                    get_virtualDisplay()
+                    make_image_reader()
+                    virtualDisplay = get_virtualDisplay()!!
 
+                    Log.d("onOrientationChanged","시작-14")
                 }
             } else {
-
+                Log.d("onOrientationChanged","시작-5")
             }
         }
 
@@ -167,14 +167,14 @@ class BackgroundServiceMP(
             val metrics = DisplayMetrics()
             var wm = context.getSystemService(Context.WINDOW_SERVICE) as WindowManager
             display!!.getMetrics(metrics)
-            BackgroundService.mRotation = wm.getDefaultDisplay().getRotation()
+            BackgroundService.mRotation = wm!!.getDefaultDisplay().getRotation()
             // get width and height
             val size = Point()
             display!!.getSize(size)
             BackgroundService.mWidth = size.x
             BackgroundService.mHeight = size.y
             var aa = size.toString()
-
+            Log.e("여기----------",aa.toString())
             // start capture reader
             BackgroundService.imageReader = ImageReader.newInstance(
                 BackgroundService.mWidth!!,
@@ -184,4 +184,8 @@ class BackgroundServiceMP(
             )
         }
     }
+
+
+
 }
+
