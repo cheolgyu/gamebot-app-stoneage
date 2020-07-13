@@ -13,7 +13,6 @@ import android.os.Handler
 import android.os.Looper
 import android.util.DisplayMetrics
 import android.util.Log
-import android.view.Display
 import android.view.OrientationEventListener
 import android.view.WindowManager
 
@@ -21,12 +20,10 @@ import android.view.WindowManager
 class BackgroundServiceMP(
     val context: Context,
     val mediaProjectionManager: MediaProjectionManager,
-    val display: Display,
-    var mRotation: Int
+    val wm: WindowManager
 ) {
 
     var mProjectionStopped = true
-    val TAG: String = ""
     var mDensity = 0
     val SCREENCAP_NAME = "screencap"
     val VIRTUAL_DISPLAY_FLAGS =
@@ -44,7 +41,6 @@ class BackgroundServiceMP(
                 my_data!!
             )
 
-
         // start capture handling thread
         object : Thread() {
             override fun run() {
@@ -54,56 +50,7 @@ class BackgroundServiceMP(
             }
         }.start()
 
-        Log.d(TAG, "1111111111111111111createVirtualDisplay1111111111111111111111")
-
-        // display metrics
-
-        // display metrics
-        val metrics = DisplayMetrics()
-        display.getMetrics(metrics)
-        mDensity = metrics.densityDpi
-
-        // get width and height
-        val size = Point()
-        display.getSize(size)
-        BackgroundService.mWidth = size.x
-        BackgroundService.mHeight = size.y
-
-//
-//        // start capture reader
-//        var imageReader = ImageReader.newInstance(
-//            mWidth,
-//            mHeight,
-//            PixelFormat.RGBA_8888,
-//            2
-//        )
-
         virtualDisplay = get_virtualDisplay()!!
-
-        var mHandler2: Handler? = null
-        // start capture handling thread
-//        object : Thread() {
-//            override fun run() {
-//                Looper.prepare()
-//                mHandler2 = Handler()
-//                Looper.loop()
-//            }
-//        }.start()
-
-//        mHandler2.
-//        while (true){
-//            var img = imageReader.acquireLatestImage()
-//            Log.e("test",img.toString())
-//        }
-       // var imgListener = ImageAvailableListener()
-        //BackgroundService.imageReader.setOnImageAvailableListener(imgListener)
-//        imageReader.setOnImageAvailableListener(
-//            BackgroundServiceMPListener(
-//                mWidth,
-//                mHeight,
-//                STORE_DIRECTORY
-//            ), null
-//        )
         mProjectionStopped = false
 
         val orientationChangeCallback = OrientationChangeCallback()
@@ -115,7 +62,11 @@ class BackgroundServiceMP(
     }
 
     fun get_virtualDisplay(): VirtualDisplay? {
-
+        make_image_reader()
+        var str = "BackgroundService.mWidth="+BackgroundService.mWidth
+        str += "BackgroundService.mHeight="+BackgroundService.mHeight
+        str += "BackgroundService.mDensity="+mDensity
+        Log.d("my-err",str)
         return mediaProjection!!.createVirtualDisplay(
             SCREENCAP_NAME,
             BackgroundService.mWidth!!,
@@ -128,63 +79,55 @@ class BackgroundServiceMP(
         )
     }
 
+    @SuppressLint("WrongConstant")
+    fun make_image_reader() {
+
+
+        val metrics = DisplayMetrics()
+        val display = wm.defaultDisplay
+        wm.defaultDisplay.getMetrics(metrics)
+        mDensity = metrics.densityDpi
+
+        display!!.getMetrics(metrics)
+        BackgroundService.mRotation = wm!!.getDefaultDisplay().getRotation()
+        // get width and height
+        val size = Point()
+        display!!.getSize(size)
+        BackgroundService.mWidth = size.x
+        BackgroundService.mHeight = size.y
+        var aa = size.toString()
+        // start capture reader
+        BackgroundService.imageReader = ImageReader.newInstance(
+            BackgroundService.mWidth!!,
+            BackgroundService.mHeight!!,
+            PixelFormat.RGBA_8888,
+            2
+        )
+    }
+
     inner class OrientationChangeCallback internal constructor(
 
     ) :
         OrientationEventListener(context) {
         override fun onOrientationChanged(orientation: Int) {
-
+            val display = wm.defaultDisplay
             val rotation: Int = display.getRotation();
-            Log.d("onOrientationChanged","시작 mRotation=$mRotation,rotation=$rotation")
-            if (rotation != mRotation) {
+            if (rotation != BackgroundService.mRotation) {
 
-                Log.d("onOrientationChanged","시작-1")
-                //mRotation = rotation
                 if (virtualDisplay != null) {
                     virtualDisplay!!.release()
-                    Log.d("onOrientationChanged","시작-12")
                 }
                 if (BackgroundService.imageReader != null) {
                     BackgroundService.imageReader!!.setOnImageAvailableListener(null, null)
-                    //
-                    Log.d("onOrientationChanged","시작-13")
                 }
                 if (!mProjectionStopped) {
-                    make_image_reader()
                     virtualDisplay = get_virtualDisplay()!!
-
-                    Log.d("onOrientationChanged","시작-14")
                 }
-            } else {
-                Log.d("onOrientationChanged","시작-5")
             }
         }
 
-        @SuppressLint("WrongConstant")
-        fun make_image_reader() {
 
-            // display metrics
-            val metrics = DisplayMetrics()
-            var wm = context.getSystemService(Context.WINDOW_SERVICE) as WindowManager
-            display!!.getMetrics(metrics)
-            BackgroundService.mRotation = wm!!.getDefaultDisplay().getRotation()
-            // get width and height
-            val size = Point()
-            display!!.getSize(size)
-            BackgroundService.mWidth = size.x
-            BackgroundService.mHeight = size.y
-            var aa = size.toString()
-            Log.e("여기----------",aa.toString())
-            // start capture reader
-            BackgroundService.imageReader = ImageReader.newInstance(
-                BackgroundService.mWidth!!,
-                BackgroundService.mHeight!!,
-                PixelFormat.RGBA_8888,
-                2
-            )
-        }
     }
-
 
 
 }

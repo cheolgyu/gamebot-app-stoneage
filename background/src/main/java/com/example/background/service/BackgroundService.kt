@@ -1,21 +1,16 @@
 package com.example.background.service
 
 //import com.example.tf.tflite.Run
-import android.annotation.SuppressLint
 import android.app.Service
 import android.content.ContentValues
 import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
-import android.graphics.PixelFormat
-import android.graphics.Point
 import android.media.Image
 import android.media.ImageReader
 import android.media.projection.MediaProjectionManager
-import android.os.Handler
 import android.os.IBinder
 import android.os.SystemClock
-import android.util.DisplayMetrics
 import android.util.Log
 import android.view.Surface
 import android.view.WindowManager
@@ -31,18 +26,15 @@ var my_resultCode: Int? = null
 var STORE_DIRECTORY: String? = null
 
 
-class BackgroundService : Service()  {
+class BackgroundService : Service() {
     companion object {
-        var mBackgroundThread : BackgroundThread? = null
-        var mBackgroundThreadHandler: Handler? = null
+        var mBackgroundThread: BackgroundThread? = null
         var imageReader: ImageReader? = null
         var mWidth: Int? = null
         var mHeight: Int? = null
         var mRotation: Int? = null
         private val FOREGROUND_SERVICE_ID = 1000
-        private var cap_filename: String? = null
 
-        var STORE_DIRECTORY_CHK: String? = null
         val TAG: String = com.example.background.MediaProjectionActivity::class.java.getName()
 
         var context: Context? = null
@@ -79,14 +71,13 @@ class BackgroundService : Service()  {
         }
     }
 
-     val mediaProjectionManager: MediaProjectionManager by lazy {
+    val mediaProjectionManager: MediaProjectionManager by lazy {
         getSystemService(Context.MEDIA_PROJECTION_SERVICE) as MediaProjectionManager
     }
 
-     val windowManager: WindowManager by lazy {
+    val windowManager: WindowManager by lazy {
         getSystemService(Context.WINDOW_SERVICE) as WindowManager
     }
-
 
 
     @Throws(java.lang.Exception::class)
@@ -96,23 +87,11 @@ class BackgroundService : Service()  {
             "--------------BackgroundService --------onStartCommand---------RUN_BACKGROUND=$RUN_BACKGROUND,action=$my_action"
         )
         if (RUN_BACKGROUND) {
-            //
-            /*
-
-            백그라운드 서비스 에서 이미지리더 생성후
-            var img = imageReader.acquireLatestImage() 로 이미지 가져오고
-            tflite로 좌표구하고
-            구한결과 접근성.터치 로 실행.
-
-             */
-
-            make_image_reader()
 
             BackgroundServiceMP(
                 context!!,
                 mediaProjectionManager,
-                windowManager.defaultDisplay,
-                mRotation!!
+                windowManager
             ).createVirtualDisplay()
 
             // start capture handling thread
@@ -171,28 +150,6 @@ class BackgroundService : Service()  {
 
         }
         return null
-    }
-
-    @SuppressLint("WrongConstant")
-    fun make_image_reader() {
-        // display metrics
-        val metrics = DisplayMetrics()
-        var display = windowManager.defaultDisplay
-        display!!.getMetrics(metrics)
-        mRotation = getScreenOrientation()
-        // get width and height
-        val size = Point()
-        display!!.getSize(size)
-        mWidth = size.x
-        mHeight = size.y
-
-        // start capture reader
-        imageReader = ImageReader.newInstance(
-            mWidth!!,
-            mHeight!!,
-            PixelFormat.RGBA_8888,
-            2
-        )
     }
 
     fun getScreenOrientation(): Int {
@@ -302,7 +259,6 @@ class BackgroundService : Service()  {
         override fun run() {
             while (RUN_BACKGROUND) {
                 Thread.sleep(1000)
-             //   Looper.prepare()
 
                 Log.e(
                     "쓰레드",
