@@ -4,7 +4,6 @@ import android.content.Context
 import android.content.res.AssetManager
 import android.graphics.*
 import android.util.Log
-import android.util.Size
 import com.example.tf.env.ImageUtils
 import com.example.tf.tflite.Classifier.Recognition
 import com.example.tf.tracking.MultiBoxTracker
@@ -22,12 +21,11 @@ class Run(val context: Context, val rotation: Int) {
     private var sensorOrientation: Int? = null
     private var timestamp: Long = 0
 
-    private val CONFIDENCE = 50
+    private val CONFIDENCE = 15
     private val MODEL_INPUT_SIZE = 300
     private val IS_MODEL_QUANTIZED = false
-    private val MODEL_FILE = "stoneage_v_2.tflite"
+    private val MODEL_FILE = "stoneage_v_3.tflite"
     private val LABELS_FILE = "file:///android_asset/stoneage.txt"
-    private val IMAGE_SIZE = Size(1080, 1794)
 
     private var detector: Classifier? = null
     private var croppedBitmap: Bitmap? = null
@@ -40,14 +38,8 @@ class Run(val context: Context, val rotation: Int) {
     fun build(fullPath: String) {
 
         var bitmap = loadImage(fullPath)
-        Log.d("리사이즈---bitmap-불러온 후", bitmap!!.width.toString() + "," + bitmap!!.height.toString())
         previewWidth = bitmap!!.width
         previewHeight = bitmap!!.height
-
-        Log.e(
-            "run.kt",
-            "rotation=$rotation,previewWidth=$previewWidth, previewHeight=$previewHeight"
-        )
 
         // 90,270 이 가로
         sensorOrientation = 0
@@ -114,7 +106,7 @@ class Run(val context: Context, val rotation: Int) {
 
     // @Throws(java.lang.Exception::class)
     fun get_xy(fullPath: String): FloatArray? {
-        val save_result = false
+        val save_result = true
         val canvas = Canvas(croppedBitmap!!)
         val ori_canvas = Canvas(oriBitmap!!)
 
@@ -155,14 +147,14 @@ class Run(val context: Context, val rotation: Int) {
         paint.strokeWidth = 2.0f
         ++timestamp
         val currTimestamp: Long = timestamp
-
+        Log.d("run--", fullPath)
         if (results!!.isNotEmpty()) {
             // Log.d("예측결과- results ",results.toString())
             if (save_result) {
 
                 var mappedRecognitions = LinkedList<Recognition>()
                 var ori_mappedRecognitions = LinkedList<Recognition>()
-                val MINIMUM_CONFIDENCE_TF_OD_API = 0.8f
+                val MINIMUM_CONFIDENCE_TF_OD_API = 0.3f
                 val minimumConfidence: Float =
                     MINIMUM_CONFIDENCE_TF_OD_API
                 for (result2 in results) {
@@ -170,9 +162,9 @@ class Run(val context: Context, val rotation: Int) {
                     val location = result!!.getLocation()
                     //Log.d("예측결과- all ",result.getConfidence_int().toString()+"% -"+result.getTitle()+"-"+result.getLocation())
                     val test = result.getConfidence()!! >= minimumConfidence
-                    if (location != null && test) {
-
-                        val ori_result = result
+                    if (location != null ) {
+                        Log.d("run-예측결과- location 111--", result.getTitle()+"-"+result.getConfidence()+"-" + location.toString())
+                        val ori_result  = result
                         result.setLocation(location)
                         mappedRecognitions.add(result)
                         canvas.drawRect(location, paint)
@@ -184,8 +176,8 @@ class Run(val context: Context, val rotation: Int) {
                         ori_mappedRecognitions.add(ori_result)
                         ori_canvas.drawRect(bbox, paint)
 
-                        Log.d("예측결과- location ", "" + location.toString())
-                        Log.d("예측결과- bbox ", "" + bbox.toString())
+                        Log.d("run-예측결과- location 222---", "" + location.toString())
+                        Log.d("run-예측결과- bbox ", "" + bbox.toString())
 
 
                     }
@@ -219,30 +211,23 @@ class Run(val context: Context, val rotation: Int) {
             var max_item = results[0]
             val location = max_item!!.getLocation()
             var con = max_item?.getConfidence_int()!!
-            Log.d("모델결과-con: ", "$con % ")
             if (con < CONFIDENCE) {
-                Log.d("모델결과-Confidence 너무낮아", max_item.toString())
-                Log.d("모델결과-Confidence 너무낮아", "$con")
                 return null
             } else {
                 val bbox = RectF()
                 frameToCanvasMatrix!!.mapRect(bbox, location)
                 Log.d("모델결과- location ", "" + location.toString())
-                Log.d("모델결과- bbox ", "" + bbox.toString())
+                Log.d("모델결과- bbox     ", "" + bbox.toString())
+                var item = if(save_result) location else  bbox
 
-                var x = bbox.left + (bbox.right - bbox.left) / 2
-                var y = bbox.top + (bbox.bottom - bbox.top) / 2
+                var x = item.left + (item.right - item.left) / 2
+                var y = item.top + (item.bottom - item.top) / 2
                 if (x != null && y != null) {
                     f_arr.set(0, x)
                     f_arr.set(1, y)
-                    Log.d("모델결과-max_item ", max_item.toString())
-                    Log.d("모델결과-bbox ", bbox.top.toString())
-                    Log.d("모델결과-bbox ", bbox.bottom.toString())
-                    Log.d("모델결과-bbox ", bbox.left.toString())
-                    Log.d("모델결과-bbox ", bbox.right.toString())
 
-                    Log.d("모델결과-x,y ", x.toString())
-                    Log.d("모델결과-x,y ", y.toString())
+                    Log.d("run-모델결과-x,y ", x.toString())
+                    Log.d("run-모델결과-x,y ", y.toString())
                     if (x < 0 || y < 0) {
                         return null
                     }
