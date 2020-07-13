@@ -6,6 +6,7 @@ import android.accessibilityservice.GestureDescription.StrokeDescription
 import android.content.Context
 import android.graphics.Path
 import android.graphics.PixelFormat
+import android.util.Log
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
@@ -54,6 +55,7 @@ class TouchService : AccessibilityService() {
         val clickPath = Path()
         clickPath.moveTo(x, y)
         val gestureBuilder = GestureDescription.Builder()
+        Log.d("클릭","x=$x,y=$y")
         gestureBuilder.addStroke(StrokeDescription(clickPath, 0, 1000))
         dispatchGesture(gestureBuilder.build(), null, null)
     }
