@@ -138,38 +138,6 @@ class BackgroundService : Service() {
                 FileOutputStream(my_file)
             Log.d("리사이즈---bitmap-정보",bitmap.width.toString()+","+bitmap.height.toString())
             bitmap.compress(Bitmap.CompressFormat.JPEG, 100, fos)
-//            // 화면 크기 구하기
-//
-//            // 화면 크기 구하기
-//            val displayWidth = mWidth!!
-//            val displayHeight = mHeight!!
-//
-//            // 리사이즈할 이미지 크기 구하기
-//
-//            // 리사이즈할 이미지 크기 구하기
-//            val options = BitmapFactory.Options()
-//            options.inPreferredConfig = Bitmap.Config.RGB_565
-//            options.inJustDecodeBounds = true
-//            BitmapFactory.decodeFile(my_file, options)
-//
-//            // 화면 크기에 가장 근접하는 이미지의 리스케일 사이즈를 구한다.
-//
-//            // 화면 크기에 가장 근접하는 이미지의 리스케일 사이즈를 구한다.
-//            val widthScale = options.outWidth / displayWidth.toFloat()
-//            val heightScale = options.outHeight / displayHeight.toFloat()
-//            val scale = if (widthScale > heightScale) widthScale else heightScale
-//
-//            if (scale >= 8) {
-//                options.inSampleSize = 8
-//            } else if (scale >= 4) {
-//                options.inSampleSize = 4
-//            } else if (scale >= 2) {
-//                options.inSampleSize = 2
-//            } else {
-//                options.inSampleSize = 1
-//            }
-//            options.inJustDecodeBounds = false
-//            BitmapFactory.decodeFile(my_file, options);
 
             Log.e(
                 ContentValues.TAG,
@@ -290,7 +258,7 @@ class BackgroundService : Service() {
 
         override fun run() {
             while (RUN_BACKGROUND) {
-                Thread.sleep(1000)
+                Thread.sleep(100)
 
                 Log.e(
                     "쓰레드",

@@ -5,6 +5,7 @@ import android.content.Context
 import android.graphics.PixelFormat
 import android.graphics.Point
 import android.hardware.display.DisplayManager
+import android.hardware.display.DisplayManager.VIRTUAL_DISPLAY_FLAG_AUTO_MIRROR
 import android.hardware.display.VirtualDisplay
 import android.media.ImageReader
 import android.media.projection.MediaProjection
@@ -27,7 +28,7 @@ class BackgroundServiceMP(
     var mDensity = 0
     val SCREENCAP_NAME = "screencap"
     val VIRTUAL_DISPLAY_FLAGS =
-        DisplayManager.VIRTUAL_DISPLAY_FLAG_OWN_CONTENT_ONLY or DisplayManager.VIRTUAL_DISPLAY_FLAG_PUBLIC
+        DisplayManager.VIRTUAL_DISPLAY_FLAG_OWN_CONTENT_ONLY or DisplayManager.VIRTUAL_DISPLAY_FLAG_PUBLIC or 	VIRTUAL_DISPLAY_FLAG_AUTO_MIRROR
     var mHandler: Handler? = null
     var virtualDisplay: VirtualDisplay? = null
     var mediaProjection: MediaProjection? = null
@@ -83,16 +84,16 @@ class BackgroundServiceMP(
     fun make_image_reader() {
 
 
-        val metrics = DisplayMetrics()
-        val display = wm.defaultDisplay
+        var metrics = DisplayMetrics()
+        var display = wm.defaultDisplay
         wm.defaultDisplay.getMetrics(metrics)
         mDensity = metrics.densityDpi
 
         display!!.getMetrics(metrics)
         BackgroundService.mRotation = wm!!.getDefaultDisplay().getRotation()
         // get width and height
-        val size = Point()
-        display!!.getSize(size)
+        var size = Point()
+        display.getRealSize(size)
         BackgroundService.mWidth = size.x
         BackgroundService.mHeight = size.y
         var aa = size.toString()
@@ -101,7 +102,7 @@ class BackgroundServiceMP(
             BackgroundService.mWidth!!,
             BackgroundService.mHeight!!,
             PixelFormat.RGBA_8888,
-            2
+            10
         )
     }
 

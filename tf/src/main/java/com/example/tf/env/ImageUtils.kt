@@ -65,7 +65,6 @@ class ImageUtils {
             val inHeight = if (transpose) srcWidth else srcHeight
 
 
-            Log.e("이미지사이즈 조절- 시작","inWidth=$inWidth, inHeight=$inHeight ")
             // Apply scaling if necessary.
             if (inWidth != dstWidth || inHeight != dstHeight) {
 
@@ -78,16 +77,13 @@ class ImageUtils {
                 //이게 비율대로 축소됨.
                 //matrix.postScale(scaleFactorX, scaleFactorY)
 
-                Log.e("이미지사이즈 조절- 비율","scaleFactor=$scaleFactor, scaleFactorX=$scaleFactorX, scaleFactorY=$scaleFactorY ")
 
                 if (maintainAspectRatio) {
-                    Log.e("이미지사이즈 조절- 처리","1 블록")
                     // Scale by minimum factor so that dst is filled completely while
                     // maintaining the aspect ratio. Some image may fall off the edge.
                     val scaleFactor = Math.max(scaleFactorX, scaleFactorY)
                     matrix.postScale(scaleFactor, scaleFactor)
                 } else {
-                    Log.e("이미지사이즈 조절- 처리","2 블록")
                     // Scale exactly to fill dst from src.
                     matrix.postScale(scaleFactorX, scaleFactorY)
                 }
