@@ -47,7 +47,7 @@ class Run(val context: Context,val rotation: Int) {
         Log.e("run.kt", "rotation=$rotation,previewWidth=$previewWidth, previewHeight=$previewHeight")
 
         // 90,270 이 가로
-        sensorOrientation = rotation
+        sensorOrientation = 0
         oriBitmap = Bitmap.createBitmap(previewWidth, previewHeight, Bitmap.Config.ARGB_8888)
 
         tracker = MultiBoxTracker(context)
