@@ -12,6 +12,7 @@ import android.graphics.Point
 import android.media.Image
 import android.media.ImageReader
 import android.media.projection.MediaProjectionManager
+import android.os.Handler
 import android.os.IBinder
 import android.os.SystemClock
 import android.util.DisplayMetrics
@@ -29,8 +30,11 @@ var my_data: Intent? = null
 var my_resultCode: Int? = null
 var STORE_DIRECTORY: String? = null
 
-class BackgroundService : Service() {
+
+class BackgroundService : Service()  {
     companion object {
+        var mBackgroundThread : BackgroundThread? = null
+        var mBackgroundThreadHandler: Handler? = null
         var imageReader: ImageReader? = null
         var mWidth: Int? = null
         var mHeight: Int? = null
@@ -75,13 +79,15 @@ class BackgroundService : Service() {
         }
     }
 
-    private val mediaProjectionManager: MediaProjectionManager by lazy {
+     val mediaProjectionManager: MediaProjectionManager by lazy {
         getSystemService(Context.MEDIA_PROJECTION_SERVICE) as MediaProjectionManager
     }
 
-    private val windowManager: WindowManager by lazy {
+     val windowManager: WindowManager by lazy {
         getSystemService(Context.WINDOW_SERVICE) as WindowManager
     }
+
+
 
     @Throws(java.lang.Exception::class)
     override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
@@ -106,56 +112,12 @@ class BackgroundService : Service() {
                 context!!,
                 mediaProjectionManager,
                 windowManager.defaultDisplay,
-                imageReader!!,
                 mRotation!!
             ).createVirtualDisplay()
 
             // start capture handling thread
-            object : Thread() {
-                override fun run() {
-                    while (RUN_BACKGROUND) {
-                        Thread.sleep(1000)
-                        Log.e(
-                            "쓰레드",
-                            "--------------------------------------------"
-                        )
-//                            val so = getScreenOrientation()
-//                            if(so == 90 || so ==270){
-//                                val tmp = mWidth
-//                                mWidth = mHeight
-//                                mHeight = tmp
-//                            }
-                        Log.e(
-                            "쓰레드",
-                            "-------------------mWidth=$mWidth--mHeight=$mHeight-----------------------"
-                        )
-                        var full_path = image_available()
-
-                        if (full_path != null && full_path != "") {
-                            var arr: FloatArray? = tflite_run(full_path)
-                            if (arr != null) {
-                                var x = arr.get(0)
-                                var y = arr.get(1)
-                                Log.e(
-                                    "쓰레드",
-                                    "--------------$x---$y---------------------------"
-                                )
-                                touchService!!.click(x, y)
-                            } else {
-                                Log.e(
-                                    "쓰레드",
-                                    "tflite_run return null "
-                                )
-                            }
-                        } else {
-                            Log.e(
-                                "쓰레드",
-                                "image_available null "
-                            )
-                        }
-                    }
-                }
-            }.start()
+            mBackgroundThread = BackgroundThread()
+            mBackgroundThread!!.start()
 
             Toast.makeText(this, "service starting~~~~~~~``", Toast.LENGTH_SHORT).show()
         } else {
@@ -167,6 +129,7 @@ class BackgroundService : Service() {
     }
 
 
+    //mp 서비스에서 구현
     fun image_available(): String? {
         var image = imageReader!!.acquireLatestImage()
         if (image != null) {
@@ -333,5 +296,51 @@ class BackgroundService : Service() {
         // Stop the foreground service.
         stopSelf()
     }
+
+    inner class BackgroundThread : Thread() {
+
+        override fun run() {
+            while (RUN_BACKGROUND) {
+                Thread.sleep(1000)
+             //   Looper.prepare()
+
+                Log.e(
+                    "쓰레드",
+                    "--------------------------------------------"
+                )
+
+                Log.e(
+                    "쓰레드",
+                    "-------------------mWidth=$mWidth--mHeight=$mHeight-----------------------"
+                )
+                var full_path = image_available()
+
+                if (full_path != null && full_path != "") {
+                    var arr: FloatArray? = tflite_run(full_path)
+                    if (arr != null) {
+                        var x = arr.get(0)
+                        var y = arr.get(1)
+                        Log.e(
+                            "쓰레드",
+                            "--------------$x---$y---------------------------"
+                        )
+                        touchService!!.click(x, y)
+                    } else {
+                        Log.e(
+                            "쓰레드",
+                            "tflite_run return null "
+                        )
+                    }
+                } else {
+                    Log.d(
+                        "쓰레드",
+                        "image_available null "
+                    )
+                }
+            }
+        }
+
+    }
+
 
 }
