@@ -14,7 +14,7 @@ import java.io.FileOutputStream
 import java.util.*
 
 
-class Run(val context: Context,val rotation: Int) {
+class Run(val context: Context, val rotation: Int) {
     private var tracker: MultiBoxTracker? = null
     private var ori_tracker: MultiBoxTracker? = null
     protected var previewWidth = 0
@@ -40,11 +40,14 @@ class Run(val context: Context,val rotation: Int) {
     fun build(fullPath: String) {
 
         var bitmap = loadImage(fullPath)
-
+        Log.d("리사이즈---bitmap-불러온 후", bitmap!!.width.toString() + "," + bitmap!!.height.toString())
         previewWidth = bitmap!!.width
         previewHeight = bitmap!!.height
 
-        Log.e("run.kt", "rotation=$rotation,previewWidth=$previewWidth, previewHeight=$previewHeight")
+        Log.e(
+            "run.kt",
+            "rotation=$rotation,previewWidth=$previewWidth, previewHeight=$previewHeight"
+        )
 
         // 90,270 이 가로
         sensorOrientation = 0
@@ -70,7 +73,14 @@ class Run(val context: Context,val rotation: Int) {
         croppedBitmap = Bitmap.createBitmap(cropSize, cropSize, Bitmap.Config.ARGB_8888)
 
 
-        ori_frameToCropTransform = Matrix()
+        ori_frameToCropTransform = ImageUtils.getTransformationMatrix(
+            previewWidth,
+            previewHeight,
+            previewWidth,
+            previewHeight,
+            sensorOrientation!!,
+            false
+        )
 
         frameToCropTransform = ImageUtils.getTransformationMatrix(
             previewWidth,
@@ -104,7 +114,7 @@ class Run(val context: Context,val rotation: Int) {
 
     // @Throws(java.lang.Exception::class)
     fun get_xy(fullPath: String): FloatArray? {
-        val save_result = true
+        val save_result = false
         val canvas = Canvas(croppedBitmap!!)
         val ori_canvas = Canvas(oriBitmap!!)
 
@@ -163,13 +173,9 @@ class Run(val context: Context,val rotation: Int) {
                     if (location != null && test) {
 
                         val ori_result = result
-
-
-
                         result.setLocation(location)
                         mappedRecognitions.add(result)
                         canvas.drawRect(location, paint)
-
 
                         // 이게 다시 원래로 좌표로 인식크기 변환하는거니깐 일단 주석
                         val bbox = RectF()
@@ -211,6 +217,7 @@ class Run(val context: Context,val rotation: Int) {
 
             }
             var max_item = results[0]
+            val location = max_item!!.getLocation()
             var con = max_item?.getConfidence_int()!!
             Log.d("모델결과-con: ", "$con % ")
             if (con < CONFIDENCE) {
@@ -219,16 +226,24 @@ class Run(val context: Context,val rotation: Int) {
                 return null
             } else {
                 val bbox = RectF()
-                frameToCanvasMatrix!!.mapRect(bbox, max_item.getLocation())
-                var x = bbox.centerX()
-                var y = bbox.centerY()
+                frameToCanvasMatrix!!.mapRect(bbox, location)
+                Log.d("모델결과- location ", "" + location.toString())
+                Log.d("모델결과- bbox ", "" + bbox.toString())
+
+                var x = bbox.left + (bbox.right - bbox.left) / 2
+                var y = bbox.top + (bbox.bottom - bbox.top) / 2
                 if (x != null && y != null) {
                     f_arr.set(0, x)
                     f_arr.set(1, y)
                     Log.d("모델결과-max_item ", max_item.toString())
+                    Log.d("모델결과-bbox ", bbox.top.toString())
+                    Log.d("모델결과-bbox ", bbox.bottom.toString())
+                    Log.d("모델결과-bbox ", bbox.left.toString())
+                    Log.d("모델결과-bbox ", bbox.right.toString())
+
                     Log.d("모델결과-x,y ", x.toString())
                     Log.d("모델결과-x,y ", y.toString())
-                    if(x <0 || y < 0){
+                    if (x < 0 || y < 0) {
                         return null
                     }
                     return f_arr
