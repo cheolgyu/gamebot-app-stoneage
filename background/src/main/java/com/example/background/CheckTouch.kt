@@ -1,12 +1,10 @@
 package com.example.background
 
-import android.accessibilityservice.AccessibilityServiceInfo
 import android.app.AlertDialog
 import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
 import android.provider.Settings
-import android.util.Log
 import android.view.accessibility.AccessibilityManager
 
 
@@ -14,26 +12,30 @@ class CheckTouch(val context: Context) {
     val am: AccessibilityManager by lazy {
         context.getSystemService(Context.ACCESSIBILITY_SERVICE) as AccessibilityManager
     }
+
     fun chk(): Boolean {
-        if(!checkAccessibilityPermissions()){
+        if (!checkAccessibilityPermissions()) {
             setAccessibilityPermissions()
-        }else{
+        } else {
             return true
         }
         return false
     }
 
-    fun checkAccessibilityPermissions(): Boolean {
+    fun isAccessServiceEnabled(context: Context): Boolean {
+        val prefString =
+            Settings.Secure.getString(
+                context.contentResolver,
+                Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES
+            )
+        return prefString.contains(context.getPackageName() + "/com.example.background.service.TouchService")
+    }
 
-        val list =
-            am.getEnabledAccessibilityServiceList(AccessibilityServiceInfo.FEEDBACK_ALL_MASK)
-        for (i in list.indices) {
-            val info = list[i]
-            Log.d("-----",info.resolveInfo.serviceInfo.packageName )
-            if (info.resolveInfo.serviceInfo.packageName == context.packageName) {
-                return true
-            }
+    fun checkAccessibilityPermissions(): Boolean {
+        if (am != null && am.isEnabled() && isAccessServiceEnabled(context)) {
+            return true
         }
+
         return false
     }
 
