@@ -24,11 +24,6 @@
             android:name="com.example.background.service.BackgroundService"
             android:foregroundServiceType="mediaProjection" />
 
-        <activity android:name="com.example.background.MediaProjectionActivity">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-            </intent-filter>
-        </activity>
     </application>
 
 
