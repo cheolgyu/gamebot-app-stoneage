@@ -13,11 +13,9 @@ import com.example.background.service.BackgroundService
 
 class MediaProjectionActivity : AppCompatActivity() {
     companion object {
-        private const val REQ_CODE_MEDIA_PROJECTION = 1000
-        private const val REQUEST_CODE = 100
 
         fun newInstance(context: Context): Intent =
-            Intent(context, MediaProjectionActivity::class.java).apply {
+            Intent(null, MediaProjectionActivity::class.java).apply {
                 flags = Intent.FLAG_ACTIVITY_NEW_TASK
             }
     }
@@ -26,31 +24,24 @@ class MediaProjectionActivity : AppCompatActivity() {
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
-
-        Log.d(
-            TAG,
-            "=====================================\"MediaProjectionActivity====================================="
-        )
+        super.onCreate(savedInstanceState)
 
         var mediaProjectionManager =
             getSystemService(Context.MEDIA_PROJECTION_SERVICE) as MediaProjectionManager
         var captureIntent: Intent = mediaProjectionManager.createScreenCaptureIntent()
         startActivityForResult(captureIntent, 1000)
-        super.onCreate(savedInstanceState)
+
 
 
     }
 
 
-    @RequiresApi(Build.VERSION_CODES.O)
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        Log.e(TAG, "--------------onActivityResult----------------------")
         if (resultCode == Activity.RESULT_OK) {
-            Log.d(TAG, "--------------Activity.RESULT_OK----------------------")
-            startForegroundService(
+            startService(
                 BackgroundService.newService(
                     this,
-                    "start",
+                    "start2",
                     resultCode,
                     data!!
                 )
