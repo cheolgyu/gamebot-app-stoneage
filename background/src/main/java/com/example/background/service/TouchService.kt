@@ -12,8 +12,8 @@ var touchService: TouchService? = null
 class TouchService : AccessibilityService() {
 
     override fun onServiceConnected() {
-        Log.d("onServiceConnected","start")
         super.onServiceConnected()
+        Log.d("onServiceConnected","start")
         touchService =this
     }
 
