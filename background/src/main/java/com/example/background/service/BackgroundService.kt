@@ -66,9 +66,13 @@ class BackgroundService : Service() {
 
     override fun onCreate() {
         Log.e(TAG, "--------------BackgroundService --------onCreate----------------------")
-        if (RUN_BACKGROUND) {
-            run_notify()
-            ready_media()
+        run_notify()
+        ready_media()
+        if(my_action=="start"){
+
+        }
+        if (RUN_BACKGROUND && my_action=="start2") {
+
         }
     }
 
@@ -187,17 +191,7 @@ class BackgroundService : Service() {
 
     fun ready_media() {
         mkdir()
-        /*
-        1. 메인 액티비에서  서비스 실행
-        2. 서비스에서 권한 얻기 는 서브액티비에서.
-        3.  서브액티에서는
-        mediaProjectionManager.createScreenCaptureIntent()
-        찍고
-        4. 결과는 서비스로 전달달         */
-        //생성
-
-        //권환얻기=> 는 액티비티
-       startActivity(com.example.background.MediaProjectionActivity.newInstance(context!!))
+       //startActivity(com.example.background.MediaProjectionActivity.newInstance(applicationContext))
         Log.e(
             TAG,
             "--------------BackgroundService --------my_media----------------------RUN_BACKGROUND=" + RUN_BACKGROUND

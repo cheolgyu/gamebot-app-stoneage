@@ -13,7 +13,6 @@ import android.media.projection.MediaProjectionManager
 import android.os.Handler
 import android.os.Looper
 import android.util.DisplayMetrics
-import android.util.Log
 import android.view.OrientationEventListener
 import android.view.WindowManager
 
@@ -64,10 +63,7 @@ class BackgroundServiceMP(
 
     fun get_virtualDisplay(): VirtualDisplay? {
         make_image_reader()
-        var str = "BackgroundService.mWidth="+BackgroundService.mWidth
-        str += "BackgroundService.mHeight="+BackgroundService.mHeight
-        str += "BackgroundService.mDensity="+mDensity
-        Log.d("my-err",str)
+
         return mediaProjection!!.createVirtualDisplay(
             SCREENCAP_NAME,
             BackgroundService.mWidth!!,
