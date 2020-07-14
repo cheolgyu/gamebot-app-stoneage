@@ -1,7 +1,6 @@
 package com.example.background
 
 import android.accessibilityservice.AccessibilityServiceInfo
-import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.content.Context
 import android.content.DialogInterface
@@ -11,10 +10,9 @@ import android.util.Log
 import android.view.accessibility.AccessibilityManager
 
 
-@SuppressLint("ServiceCast")
 class CheckTouch(val context: Context) {
     val am: AccessibilityManager by lazy {
-        context.getSystemService(Context.WINDOW_SERVICE) as AccessibilityManager
+        context.getSystemService(Context.ACCESSIBILITY_SERVICE) as AccessibilityManager
     }
     fun chk(): Boolean {
         if(!checkAccessibilityPermissions()){

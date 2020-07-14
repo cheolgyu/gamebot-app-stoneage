@@ -2,7 +2,10 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.example.background">
 
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+
     <application>
+
         <service
             tools:node="merge"
             android:name="com.example.background.service.TouchService"
