@@ -10,7 +10,6 @@ import android.media.Image
 import android.media.ImageReader
 import android.media.projection.MediaProjectionManager
 import android.os.IBinder
-import android.os.SystemClock
 import android.util.Log
 import android.view.Surface
 import android.view.WindowManager
@@ -123,14 +122,26 @@ class BackgroundService : Service() {
             val pixelStride: Int = planes[0].getPixelStride()
             val rowStride: Int = planes[0].getRowStride()
             val rowPadding: Int = rowStride - pixelStride * mWidth!!
-
+            Log.d(
+                "리사이즈-222--",pixelStride.toString()
+            )
+            Log.d(
+                "리사이즈-222--",rowStride.toString()
+            )
+            Log.d(
+                "리사이즈-222--",rowPadding.toString()
+            )
+            Log.d(
+                "리사이즈-222--",buffer.toString()
+            )
+            var w :Int = mWidth!! + rowPadding / pixelStride
             Log.d(
                 "리사이즈---",
-                mWidth.toString() + ",이미지:w= " + mWidth!! + rowPadding / pixelStride + ",mHeight=" + mHeight.toString()
+                mWidth.toString() + ",이미지:w= " + w + ",mHeight=" + mHeight.toString()
             )
             // create bitmap
             var bitmap = Bitmap.createBitmap(
-                mWidth!! + rowPadding / pixelStride,
+                w ,//+ rowPadding / pixelStride,
                 mHeight!!,
                 Bitmap.Config.ARGB_8888
             )
@@ -139,12 +150,12 @@ class BackgroundService : Service() {
             // write bitmap to a file
 
             // write bitmap to a file
-            val file_id = SystemClock.uptimeMillis()
+            val file_id = System.currentTimeMillis()
             var my_file = STORE_DIRECTORY + file_id + ".JPEG"
             fos =
                 FileOutputStream(my_file)
             Log.d("리사이즈---bitmap-정보", bitmap.width.toString() + "," + bitmap.height.toString())
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, fos)
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 1, fos)
 
             Log.e(
                 ContentValues.TAG,

@@ -70,7 +70,7 @@ class BackgroundServiceMP(
             BackgroundService.mHeight!!,
             mDensity,
             VIRTUAL_DISPLAY_FLAGS,
-            BackgroundService.imageReader!!.getSurface(),
+            BackgroundService.imageReader!!.surface,
             null,
             mHandler
         )
@@ -98,7 +98,7 @@ class BackgroundServiceMP(
             BackgroundService.mWidth!!,
             BackgroundService.mHeight!!,
             PixelFormat.RGBA_8888,
-            10
+            2
         )
     }
 
