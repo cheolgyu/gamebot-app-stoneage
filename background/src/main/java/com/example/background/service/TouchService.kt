@@ -13,9 +13,9 @@ var touchService: TouchService? = null
 class TouchService : AccessibilityService() {
     var mLayout: FrameLayout? = null
     override fun onServiceConnected() {
-        Log.d("TouchService-0000000000","4444444444444")
-        Log.d("TouchService-onServiceConnected","start")
-        touchService =this
+        Log.d("TouchService-0000000000", "4444444444444")
+        Log.d("TouchService-onServiceConnected", "start")
+        touchService = this
 
 //        // Create an overlay and display the action bar
 //        val wm =
@@ -40,20 +40,18 @@ class TouchService : AccessibilityService() {
         val clickPath = Path()
         clickPath.moveTo(x, y)
         val gestureBuilder = GestureDescription.Builder()
-        Log.d("클릭","x=$x,y=$y")
+        Log.d("클릭", "x=$x,y=$y")
         gestureBuilder.addStroke(StrokeDescription(clickPath, 0, 1000))
         dispatchGesture(gestureBuilder.build(), null, null)
     }
 
     override fun onInterrupt() {
-        Log.d("TouchService-3333333333","4444444444444")
+        Log.d("TouchService-3333333333", "4444444444444")
     }
 
     override fun onAccessibilityEvent(p0: AccessibilityEvent?) {
-        Log.d("TouchService-111111111","2222222222222222222222")
+        Log.d("TouchService-111111111", "2222222222222222222222")
     }
-
-
 
 
 }

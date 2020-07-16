@@ -27,7 +27,7 @@ class BackgroundServiceMP(
     var mDensity = 0
     val SCREENCAP_NAME = "screencap"
     val VIRTUAL_DISPLAY_FLAGS =
-        DisplayManager.VIRTUAL_DISPLAY_FLAG_OWN_CONTENT_ONLY or DisplayManager.VIRTUAL_DISPLAY_FLAG_PUBLIC or 	VIRTUAL_DISPLAY_FLAG_AUTO_MIRROR
+        DisplayManager.VIRTUAL_DISPLAY_FLAG_OWN_CONTENT_ONLY or DisplayManager.VIRTUAL_DISPLAY_FLAG_PUBLIC or VIRTUAL_DISPLAY_FLAG_AUTO_MIRROR
     var mHandler: Handler? = null
     var virtualDisplay: VirtualDisplay? = null
     var mediaProjection: MediaProjection? = null
