@@ -68,10 +68,10 @@ class BackgroundService : Service() {
         Log.e(TAG, "--------------BackgroundService --------onCreate----------------------")
         run_notify()
         ready_media()
-        if(my_action=="start"){
+        if (my_action == "start") {
 
         }
-        if (RUN_BACKGROUND && my_action=="start2") {
+        if (RUN_BACKGROUND && my_action == "start2") {
 
         }
     }
@@ -124,7 +124,10 @@ class BackgroundService : Service() {
             val rowStride: Int = planes[0].getRowStride()
             val rowPadding: Int = rowStride - pixelStride * mWidth!!
 
-            Log.d("리사이즈---",mWidth.toString()+",이미지:w= "+mWidth!! + rowPadding / pixelStride+",mHeight="+mHeight.toString())
+            Log.d(
+                "리사이즈---",
+                mWidth.toString() + ",이미지:w= " + mWidth!! + rowPadding / pixelStride + ",mHeight=" + mHeight.toString()
+            )
             // create bitmap
             var bitmap = Bitmap.createBitmap(
                 mWidth!! + rowPadding / pixelStride,
@@ -140,7 +143,7 @@ class BackgroundService : Service() {
             var my_file = STORE_DIRECTORY + file_id + ".JPEG"
             fos =
                 FileOutputStream(my_file)
-            Log.d("리사이즈---bitmap-정보",bitmap.width.toString()+","+bitmap.height.toString())
+            Log.d("리사이즈---bitmap-정보", bitmap.width.toString() + "," + bitmap.height.toString())
             bitmap.compress(Bitmap.CompressFormat.JPEG, 100, fos)
 
             Log.e(
@@ -191,7 +194,7 @@ class BackgroundService : Service() {
 
     fun ready_media() {
         mkdir()
-       //startActivity(com.example.background.MediaProjectionActivity.newInstance(applicationContext))
+        //startActivity(com.example.background.MediaProjectionActivity.newInstance(applicationContext))
         Log.e(
             TAG,
             "--------------BackgroundService --------my_media----------------------RUN_BACKGROUND=" + RUN_BACKGROUND
@@ -235,12 +238,12 @@ class BackgroundService : Service() {
     override fun onDestroy() {
         Log.d("", "onDestroy")
         RUN_BACKGROUND = false
-        Toast.makeText(this, "service done onDestroy" , Toast.LENGTH_SHORT).show()
+        Toast.makeText(this, "service done onDestroy", Toast.LENGTH_SHORT).show()
     }
 
     fun stopForegroundService() {
         Log.d("", "Stop foreground service.")
-        Toast.makeText(this, "service done stopForegroundService" , Toast.LENGTH_SHORT).show()
+        Toast.makeText(this, "service done stopForegroundService", Toast.LENGTH_SHORT).show()
         // Stop foreground service and remove the notification.
         stopForeground(true)
 
