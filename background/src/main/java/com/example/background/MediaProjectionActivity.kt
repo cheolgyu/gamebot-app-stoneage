@@ -14,9 +14,12 @@ import kotlinx.android.synthetic.main.activity_mediaprojection.*
 
 open class MediaProjectionActivity : AppCompatActivity() {
     var msg = "접근성 권한이 필요해요."
-
+    var bg : BackgroundService ?= null
+    var mIntent : Intent ?= null
     override fun onResume() {
         super.onResume()
+        bg = BackgroundService()
+        mIntent = Intent(applicationContext, BackgroundService::class.java)
         if (CheckTouch(this).chk()) {
             msg = "접근성 권한을 얻었습니다."
             textView2.setText(msg)
@@ -32,13 +35,13 @@ open class MediaProjectionActivity : AppCompatActivity() {
 
         val action = intent.extras?.getString("action")
         if (action != null && action == "stop") {
-            startService(BackgroundService.newService(this, "stop"))
+            stopService(mIntent)
         }
 
     }
 
     fun service_stop_btn(view: View?) {
-        startService(BackgroundService.newService(this, "stop"))
+        stopService(mIntent)
     }
 
     fun service_start_btn(view: View?) {
@@ -59,7 +62,9 @@ open class MediaProjectionActivity : AppCompatActivity() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (resultCode == Activity.RESULT_OK) {
-            startService(BackgroundService.newService(this, "start", resultCode, data!!))
+            mIntent?.putExtra("resultCode",resultCode)
+            mIntent?.putExtra("data",data)
+            startService(mIntent)
         } else {
             Log.e("", "=================else====================")
         }

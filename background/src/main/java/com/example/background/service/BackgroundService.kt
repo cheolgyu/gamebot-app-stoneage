@@ -1,18 +1,11 @@
 package com.example.background.service
 
 //import com.example.tf.tflite.Run
-import android.app.Service
 import android.content.ContentValues
-import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
 import android.media.Image
-import android.media.ImageReader
-import android.media.projection.MediaProjectionManager
-import android.os.IBinder
 import android.util.Log
-import android.view.Surface
-import android.view.WindowManager
 import android.widget.Toast
 import com.example.background.notification.Noti
 import java.io.File
@@ -20,92 +13,56 @@ import java.io.FileOutputStream
 import java.nio.ByteBuffer
 
 
-var RUN_BACKGROUND = false
-var my_data: Intent? = null
-var my_resultCode: Int? = null
-var STORE_DIRECTORY: String? = null
+class BackgroundService : BackgroundServiceMP() {
 
 
-class BackgroundService : Service() {
-    companion object {
-        var mBackgroundThread: BackgroundThread? = null
-        var imageReader: ImageReader? = null
-        var mWidth: Int? = null
-        var mHeight: Int? = null
-        var mRotation: Int? = null
-        private val FOREGROUND_SERVICE_ID = 1000
-
-        val TAG: String = com.example.background.MediaProjectionActivity::class.java.getName()
-
-        var context: Context? = null
-        var my_action: String? = null
-
-        fun newService(_context: Context, _action: String): Intent =
-            Intent(_context, BackgroundService::class.java).apply {
-                my_action = _action
-                context = _context
-                if (_action == "start") {
-                    RUN_BACKGROUND = true
-                } else if (_action == "stop") {
-                    RUN_BACKGROUND = false
-                }
-            }
-
-        fun newService(_context: Context, _action: String, resultCode: Int, data: Intent): Intent =
-            Intent(_context, BackgroundService::class.java).apply {
-                my_data = data
-                my_resultCode = resultCode
-                my_action = _action
-                context = _context
-                //cap_bitmap = bitmap
+    var STORE_DIRECTORY: String? = null
+    var mBackgroundThread: BackgroundThread? = null
+    private val FOREGROUND_SERVICE_ID = 1000
+    val TAG: String = "BackgroundService"
+    var my_action: String? = null
+    fun newService(_action: String): Intent =
+        Intent(applicationContext, BackgroundService::class.java).apply {
+            my_action = _action
+            if (_action == "start") {
                 RUN_BACKGROUND = true
+            } else if (_action == "stop") {
+                RUN_BACKGROUND = false
             }
+        }
 
-    }
+    fun newService(_action: String, resultCode: Int, data: Intent): Intent =
+        Intent(applicationContext, BackgroundService::class.java).apply {
+            my_data = data
+            my_resultCode = resultCode
+            my_action = _action
+            //cap_bitmap = bitmap
+            RUN_BACKGROUND = true
+        }
 
     override fun onCreate() {
-        Log.e(TAG, "--------------BackgroundService --------onCreate----------------------")
         run_notify()
         ready_media()
-        if (my_action == "start") {
-
-        }
-        if (RUN_BACKGROUND && my_action == "start2") {
-
-        }
     }
-
-    val mediaProjectionManager: MediaProjectionManager by lazy {
-        getSystemService(Context.MEDIA_PROJECTION_SERVICE) as MediaProjectionManager
-    }
-
-    val windowManager: WindowManager by lazy {
-        getSystemService(Context.WINDOW_SERVICE) as WindowManager
-    }
-
 
     @Throws(java.lang.Exception::class)
-    override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
+    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         Log.e(
             TAG,
             "--------------BackgroundService --------onStartCommand---------RUN_BACKGROUND=$RUN_BACKGROUND,action=$my_action"
         )
-        if (RUN_BACKGROUND) {
+        RUN_BACKGROUND = true
+        my_resultCode = intent!!.getIntExtra("resultCode", 1000)
+        my_data = intent!!.getParcelableExtra("data")
 
-            BackgroundServiceMP(
-                context!!,
-                mediaProjectionManager,
-                windowManager
-            ).createVirtualDisplay()
+
+            createVirtualDisplay()
 
             // start capture handling thread
             mBackgroundThread = BackgroundThread()
             mBackgroundThread!!.start()
 
             Toast.makeText(this, "service starting~~~~~~~``", Toast.LENGTH_SHORT).show()
-        } else {
-            stopForegroundService()
-        }
 
         // If we get killed, after returning from here, restart
         return START_STICKY
@@ -123,25 +80,25 @@ class BackgroundService : Service() {
             val rowStride: Int = planes[0].getRowStride()
             val rowPadding: Int = rowStride - pixelStride * mWidth!!
             Log.d(
-                "리사이즈-222--",pixelStride.toString()
+                "리사이즈-222--", pixelStride.toString()
             )
             Log.d(
-                "리사이즈-222--",rowStride.toString()
+                "리사이즈-222--", rowStride.toString()
             )
             Log.d(
-                "리사이즈-222--",rowPadding.toString()
+                "리사이즈-222--", rowPadding.toString()
             )
             Log.d(
-                "리사이즈-222--",buffer.toString()
+                "리사이즈-222--", buffer.toString()
             )
-            var w :Int = mWidth!! + rowPadding / pixelStride
+            var w: Int = mWidth!! + rowPadding / pixelStride
             Log.d(
                 "리사이즈---",
                 mWidth.toString() + ",이미지:w= " + w + ",mHeight=" + mHeight.toString()
             )
             // create bitmap
             var bitmap = Bitmap.createBitmap(
-                w ,//+ rowPadding / pixelStride,
+                w,//+ rowPadding / pixelStride,
                 mHeight!!,
                 Bitmap.Config.ARGB_8888
             )
@@ -172,14 +129,6 @@ class BackgroundService : Service() {
         return null
     }
 
-    fun getScreenOrientation(): Int {
-        return when (windowManager.getDefaultDisplay().getRotation()) {
-            Surface.ROTATION_270 -> 270
-            Surface.ROTATION_180 -> 180
-            Surface.ROTATION_90 -> 90
-            else -> 0
-        }
-    }
 
     fun tflite_run(full_path: String): FloatArray? {
         val so = getScreenOrientation()
@@ -238,28 +187,6 @@ class BackgroundService : Service() {
             )
             return
         }
-    }
-
-
-    override fun onBind(intent: Intent): IBinder? {
-        // We don't provide binding, so return null
-        return null
-    }
-
-    override fun onDestroy() {
-        Log.d("", "onDestroy")
-        RUN_BACKGROUND = false
-        Toast.makeText(this, "service done onDestroy", Toast.LENGTH_SHORT).show()
-    }
-
-    fun stopForegroundService() {
-        Log.d("", "Stop foreground service.")
-        Toast.makeText(this, "service done stopForegroundService", Toast.LENGTH_SHORT).show()
-        // Stop foreground service and remove the notification.
-        stopForeground(true)
-
-        // Stop the foreground service.
-        stopSelf()
     }
 
     inner class BackgroundThread : Thread() {
