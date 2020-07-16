@@ -235,12 +235,12 @@ class BackgroundService : Service() {
     override fun onDestroy() {
         Log.d("", "onDestroy")
         RUN_BACKGROUND = false
-        //Toast.makeText(this, "service done", Toast.LENGTH_SHORT).show()
+        Toast.makeText(this, "service done onDestroy" , Toast.LENGTH_SHORT).show()
     }
 
     fun stopForegroundService() {
         Log.d("", "Stop foreground service.")
-
+        Toast.makeText(this, "service done stopForegroundService" , Toast.LENGTH_SHORT).show()
         // Stop foreground service and remove the notification.
         stopForeground(true)
 
@@ -252,12 +252,7 @@ class BackgroundService : Service() {
 
         override fun run() {
             while (RUN_BACKGROUND) {
-                Thread.sleep(100)
-
-                Log.e(
-                    "쓰레드",
-                    "--------------------------------------------"
-                )
+                Thread.sleep(1000)
 
                 Log.e(
                     "쓰레드",
