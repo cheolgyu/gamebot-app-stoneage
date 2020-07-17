@@ -15,30 +15,11 @@ import java.nio.ByteBuffer
 
 class BackgroundService : BackgroundServiceMP() {
 
-
     var STORE_DIRECTORY: String? = null
     var mBackgroundThread: BackgroundThread? = null
     private val FOREGROUND_SERVICE_ID = 1000
     val TAG: String = "BackgroundService"
     var my_action: String? = null
-    fun newService(_action: String): Intent =
-        Intent(applicationContext, BackgroundService::class.java).apply {
-            my_action = _action
-            if (_action == "start") {
-                RUN_BACKGROUND = true
-            } else if (_action == "stop") {
-                RUN_BACKGROUND = false
-            }
-        }
-
-    fun newService(_action: String, resultCode: Int, data: Intent): Intent =
-        Intent(applicationContext, BackgroundService::class.java).apply {
-            my_data = data
-            my_resultCode = resultCode
-            my_action = _action
-            //cap_bitmap = bitmap
-            RUN_BACKGROUND = true
-        }
 
     override fun onCreate() {
         run_notify()
@@ -53,32 +34,31 @@ class BackgroundService : BackgroundServiceMP() {
         )
         RUN_BACKGROUND = true
         my_resultCode = intent!!.getIntExtra("resultCode", 1000)
-        my_data = intent!!.getParcelableExtra("data")
+        my_data = intent.getParcelableExtra("data")
 
 
-            createVirtualDisplay()
+        createVirtualDisplay()
 
-            // start capture handling thread
-            mBackgroundThread = BackgroundThread()
-           // mBackgroundThread!!.start()
+        // start capture handling thread
+        mBackgroundThread = BackgroundThread()
+        mBackgroundThread!!.start()
 
-            Toast.makeText(this, "service starting~~~~~~~``", Toast.LENGTH_SHORT).show()
+        Toast.makeText(this, "service starting~~~~~~~``", Toast.LENGTH_SHORT).show()
 
         // If we get killed, after returning from here, restart
         return START_STICKY
     }
-
 
     //mp 서비스에서 구현
     fun image_available(): String? {
         var image = imageReader!!.acquireLatestImage()
         if (image != null) {
             var fos: FileOutputStream? = null
-            val planes: Array<Image.Plane> = image.getPlanes()
-            val buffer: ByteBuffer = planes[0].getBuffer()
-            val pixelStride: Int = planes[0].getPixelStride()
-            val rowStride: Int = planes[0].getRowStride()
-            val rowPadding: Int = rowStride - pixelStride * mWidth!!
+            val planes: Array<Image.Plane> = image.planes
+            val buffer: ByteBuffer = planes[0].buffer
+            val pixelStride: Int = planes[0].pixelStride
+            val rowStride: Int = planes[0].rowStride
+            val rowPadding: Int = rowStride - pixelStride * mWidth
             Log.d(
                 "리사이즈-222--", pixelStride.toString()
             )
@@ -91,7 +71,7 @@ class BackgroundService : BackgroundServiceMP() {
             Log.d(
                 "리사이즈-222--", buffer.toString()
             )
-            var w: Int = mWidth!! + rowPadding / pixelStride
+            var w: Int = mWidth + rowPadding / pixelStride
             Log.d(
                 "리사이즈---",
                 mWidth.toString() + ",이미지:w= " + w + ",mHeight=" + mHeight.toString()
@@ -99,7 +79,7 @@ class BackgroundService : BackgroundServiceMP() {
             // create bitmap
             var bitmap = Bitmap.createBitmap(
                 w,//+ rowPadding / pixelStride,
-                mHeight!!,
+                mHeight,
                 Bitmap.Config.ARGB_8888
             )
             bitmap.copyPixelsFromBuffer(buffer)
@@ -143,8 +123,8 @@ class BackgroundService : BackgroundServiceMP() {
 
     fun run_notify() {
         var noti = Noti(this)
-        noti!!.createNotificationChannel()
-        var notify = noti!!.build(11232131);
+        noti.createNotificationChannel()
+        var notify = noti.build(11232131)
         startForeground(FOREGROUND_SERVICE_ID, notify)
         Log.e(
             TAG,
