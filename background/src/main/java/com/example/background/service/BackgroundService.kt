@@ -60,7 +60,7 @@ class BackgroundService : BackgroundServiceMP() {
 
             // start capture handling thread
             mBackgroundThread = BackgroundThread()
-            mBackgroundThread!!.start()
+           // mBackgroundThread!!.start()
 
             Toast.makeText(this, "service starting~~~~~~~``", Toast.LENGTH_SHORT).show()
 

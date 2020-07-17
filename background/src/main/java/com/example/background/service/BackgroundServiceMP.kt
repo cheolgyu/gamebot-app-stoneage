@@ -31,7 +31,7 @@ abstract class BackgroundServiceMP : Service() {
     //display
     var mWidth = 0
     var mHeight = 0
-    var mRotation = 0
+    var mRotation = -1
     var mDensity = 0
     var imageReader: ImageReader? = null
 
@@ -45,42 +45,30 @@ abstract class BackgroundServiceMP : Service() {
     val mediaProjectionManager: MediaProjectionManager by lazy {
         getSystemService(Context.MEDIA_PROJECTION_SERVICE) as MediaProjectionManager
     }
-    val windowManager: WindowManager by lazy {
-        getSystemService(Context.WINDOW_SERVICE) as WindowManager
-    }
 
     fun set_display() {
-        val displaymetrics = DisplayMetrics()
-        val wm = windowManager
-        wm.getDefaultDisplay().getMetrics(displaymetrics)
+        val wm = getSystemService(Context.WINDOW_SERVICE) as WindowManager
 
-        val screenDensityDpi = displaymetrics.densityDpi
-        val screenRotation = getScreenOrientation()
+        var metrics = DisplayMetrics()
+        var display = wm.defaultDisplay
+        wm.defaultDisplay.getMetrics(metrics)
+        mDensity = metrics.densityDpi
 
-        val size = Point()
-        wm.getDefaultDisplay().getRealSize(size)
-        val screenWidth = size.x
-        val screenHeight = size.y
-
-        mWidth = screenWidth
-        mHeight = screenHeight
-        mDensity = screenDensityDpi
-        mRotation = getScreenOrientation()
-        Log.d("chk_display!!22", "$screenRotation")
+        display!!.getMetrics(metrics)
+        mRotation = wm!!.getDefaultDisplay().getRotation()
+        // get width and height
+        var size = Point()
+        display.getRealSize(size)
+        mWidth = size.x
+        mHeight = size.y
+        Log.d("chk_display!!~~~~set_display", "조회한 xy $mWidth $mHeight")
         chk_display()
     }
 
-    fun chg_xy() {
-        Log.d("chk_display!!~~~~sss", "$mWidth,$mHeight")
-        var tmp = mWidth
-        mWidth = mHeight
-        mHeight = tmp
-        Log.d("chk_display!!~~~~eee", "$mWidth,$mHeight")
-    }
-
     fun getScreenOrientation(): Int {
-
-        val wm = applicationContext.getSystemService(Context.WINDOW_SERVICE) as WindowManager
+        val wm = getSystemService(Context.WINDOW_SERVICE) as WindowManager
+        var t1 = wm.getDefaultDisplay().getRotation()
+        Log.d("chk_display!!~~~~getScreenOrientation에서", "조회한 각도 $t1")
         return when (wm.getDefaultDisplay().getRotation()) {
             Surface.ROTATION_270 -> 270
             Surface.ROTATION_180 -> 180
@@ -93,13 +81,13 @@ abstract class BackgroundServiceMP : Service() {
         var str = "mWidth=$mWidth,"
         str += "mHeight=$mHeight,"
         str += "mRotation=$mRotation,"
-        Log.d("---chk_display-------", str)
+        Log.d("---chk_display 현재-------", str)
     }
 
 
     @SuppressLint("WrongConstant")
     fun createVirtualDisplay() {
-
+    chk_display()
         mediaProjection =
             mediaProjectionManager.getMediaProjection(
                 my_resultCode!!,
@@ -115,6 +103,7 @@ abstract class BackgroundServiceMP : Service() {
             }
         }.start()
         set_display()
+        chk_display()
         make_image_reader()
 
         virtualDisplay = get_virtualDisplay()!!
@@ -130,17 +119,19 @@ abstract class BackgroundServiceMP : Service() {
 
     fun get_virtualDisplay(): VirtualDisplay? {
         make_image_reader()
-
-        return mediaProjection!!.createVirtualDisplay(
+        var vd = mediaProjection!!.createVirtualDisplay(
             SCREENCAP_NAME,
             mWidth,
             mHeight,
             mDensity,
             VIRTUAL_DISPLAY_FLAGS,
-            imageReader!!.surface,
+            imageReader!!.getSurface(),
             null,
             mHandler
         )
+        mProjectionStopped = false
+
+        return vd
     }
 
     @SuppressLint("WrongConstant")
@@ -160,23 +151,21 @@ abstract class BackgroundServiceMP : Service() {
         OrientationEventListener(this) {
         override fun onOrientationChanged(orientation: Int) {
             chk_display()
-            Log.d("chk_display22-onOrientationChanged","$orientation")
-            if(mRotation == 0 || mRotation == 180){
-                if (orientation == 270 || orientation == 90) {
-                    mRotation = 270
-                    chg_xy()
-                }
-            }else{
-                if (orientation == 0 || orientation == 180) {
-                    mRotation = 0
-                    chg_xy()
-                }
-            }
+            val wm = getSystemService(Context.WINDOW_SERVICE) as WindowManager
+            val display = wm.defaultDisplay
+            val rotation: Int = display.getRotation();
+            var cur_rotation = rotation// getScreenOrientation()
+            Log.d(
+                "chk_display",
+                "============cur_rotation=$cur_rotation===============mRotation=$mRotation==========================="
+            )
 
+            if (mRotation != cur_rotation) {
+                Log.d("chk_display", "==================111111====================================")
 
-            Thread.sleep(100)
-            if (orientation != mRotation) {
-
+                set_display()
+                make_image_reader()
+                chk_display()
                 if (virtualDisplay != null) {
                     virtualDisplay!!.release()
                 }
@@ -186,7 +175,16 @@ abstract class BackgroundServiceMP : Service() {
                 if (!mProjectionStopped) {
                     virtualDisplay = get_virtualDisplay()!!
                 }
+
+            } else {
+                Log.d(
+                    "chk_display",
+                    "==================22222222===================================="
+                )
             }
+
+            chk_display()
+
         }
 
 
