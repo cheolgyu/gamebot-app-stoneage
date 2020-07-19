@@ -7,7 +7,6 @@ import android.content.Intent
 import android.graphics.PixelFormat
 import android.graphics.Point
 import android.hardware.display.DisplayManager
-import android.hardware.display.DisplayManager.VIRTUAL_DISPLAY_FLAG_AUTO_MIRROR
 import android.hardware.display.VirtualDisplay
 import android.media.ImageReader
 import android.media.projection.MediaProjection
@@ -38,7 +37,7 @@ abstract class BackgroundServiceMP : Service() {
     var mProjectionStopped = true
     val SCREENCAP_NAME = "screencap"
     val VIRTUAL_DISPLAY_FLAGS =
-        DisplayManager.VIRTUAL_DISPLAY_FLAG_OWN_CONTENT_ONLY or DisplayManager.VIRTUAL_DISPLAY_FLAG_PUBLIC or VIRTUAL_DISPLAY_FLAG_AUTO_MIRROR
+        DisplayManager.VIRTUAL_DISPLAY_FLAG_OWN_CONTENT_ONLY or DisplayManager.VIRTUAL_DISPLAY_FLAG_PUBLIC
     var mHandler: Handler? = null
     var virtualDisplay: VirtualDisplay? = null
     var mediaProjection: MediaProjection? = null
@@ -56,7 +55,7 @@ abstract class BackgroundServiceMP : Service() {
         }
     }
 
-    @SuppressLint("WrongConstant")
+
     fun createVirtualDisplay() {
         mediaProjection =
             mediaProjectionManager.getMediaProjection(
@@ -86,6 +85,7 @@ abstract class BackgroundServiceMP : Service() {
     fun get_virtualDisplay(): VirtualDisplay? {
         set_display()
         make_image_reader()
+        Thread.sleep(1000)
         var vd = mediaProjection!!.createVirtualDisplay(
             SCREENCAP_NAME,
             mWidth,
@@ -146,6 +146,7 @@ abstract class BackgroundServiceMP : Service() {
                     imageReader!!.setOnImageAvailableListener(null, null)
                 }
                 if (!mProjectionStopped) {
+                    mProjectionStopped = false
                     virtualDisplay = get_virtualDisplay()!!
                 }
 
