@@ -50,7 +50,9 @@ class BackgroundService : BackgroundServiceMP() {
     }
 
     //mp 서비스에서 구현
+   @Throws(Exception::class)
     fun image_available(): String? {
+        Thread.sleep(1000)
         var image = imageReader!!.acquireLatestImage()
         if (image != null) {
             var fos: FileOutputStream? = null
@@ -59,31 +61,28 @@ class BackgroundService : BackgroundServiceMP() {
             val pixelStride: Int = planes[0].pixelStride
             val rowStride: Int = planes[0].rowStride
             val rowPadding: Int = rowStride - pixelStride * mWidth
-            Log.d(
-                "리사이즈-222--", pixelStride.toString()
-            )
-            Log.d(
-                "리사이즈-222--", rowStride.toString()
-            )
-            Log.d(
-                "리사이즈-222--", rowPadding.toString()
-            )
-            Log.d(
-                "리사이즈-222--", buffer.toString()
-            )
+
             var w: Int = mWidth + rowPadding / pixelStride
-            Log.d(
-                "리사이즈---",
-                mWidth.toString() + ",이미지:w= " + w + ",mHeight=" + mHeight.toString()
-            )
-            // create bitmap
-            var bitmap = Bitmap.createBitmap(
-                w,//+ rowPadding / pixelStride,
-                mHeight,
-                Bitmap.Config.ARGB_8888
-            )
-            bitmap.copyPixelsFromBuffer(buffer)
-            image.close()
+
+            var bitmap: Bitmap? = null
+            try {
+                bitmap = Bitmap.createBitmap(
+                    w,//+ rowPadding / pixelStride,
+                    mHeight,
+                    Bitmap.Config.ARGB_8888
+                )
+                bitmap.copyPixelsFromBuffer(buffer)
+            } catch (e: Exception) {
+                Log.e(
+                    "리사이즈---",
+                    e.printStackTrace().toString()
+                )
+            }finally {
+                image.close()
+            }
+
+
+
             // write bitmap to a file
 
             // write bitmap to a file
@@ -91,21 +90,18 @@ class BackgroundService : BackgroundServiceMP() {
             var my_file = STORE_DIRECTORY + file_id + ".JPEG"
             fos =
                 FileOutputStream(my_file)
-            Log.d("리사이즈---bitmap-정보", bitmap.width.toString() + "," + bitmap.height.toString())
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 1, fos)
-
+            Log.d("리사이즈---bitmap-정보", bitmap?.width.toString() + "," + bitmap?.height.toString())
+            bitmap!!.compress(Bitmap.CompressFormat.JPEG, 100, fos)
+            fos.close()
             Log.e(
                 ContentValues.TAG,
                 "captured image: " + my_file
             )
 
-            Log.d(
-                ContentValues.TAG,
-                "-----------------------onImageAvailable----------------------------------" + my_file
-            )
             return my_file
 
         }
+
         return null
     }
 

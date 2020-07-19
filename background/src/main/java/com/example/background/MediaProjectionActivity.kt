@@ -31,7 +31,7 @@ open class MediaProjectionActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_mediaprojection)
-        textView2.setText(msg)
+        //textView2.setText(msg)
 
         val action = intent.extras?.getString("action")
         if (action != null && action == "stop") {
