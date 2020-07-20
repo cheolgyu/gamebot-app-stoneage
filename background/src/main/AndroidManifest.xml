@@ -2,17 +2,20 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.example.background">
 
-    <uses-permission tools:node="merge" android:name="android.permission.FOREGROUND_SERVICE" />
-    <uses-permission tools:node="merge" android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+    <uses-permission
+        android:name="android.permission.FOREGROUND_SERVICE"
+        tools:node="merge" />
+    <uses-permission
+        android:name="android.permission.SYSTEM_ALERT_WINDOW"
+        tools:node="merge" />
 
-    <application>
+    <application tools:node="merge">
 
         <service
-            tools:node="merge"
             android:name="com.example.background.service.TouchService"
             android:label="@string/accessibility_service_label"
             android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE">
-            <intent-filter >
+            <intent-filter>
                 <action android:name="android.accessibilityservice.AccessibilityService" />
             </intent-filter>
 

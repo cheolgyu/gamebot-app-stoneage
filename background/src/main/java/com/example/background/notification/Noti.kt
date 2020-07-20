@@ -1,6 +1,9 @@
 package com.example.background.notification
 
-import android.app.*
+import android.app.Notification
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.os.Build
@@ -9,9 +12,9 @@ import com.example.background.MediaProjectionActivity
 import com.example.background.R
 
 
-class Noti(val _context: Context)  {
+class Noti(val _context: Context) {
     val CHANNEL_ID = "1000212121"
-    var notificationManager:NotificationManager ?= null
+    var notificationManager: NotificationManager? = null
 
 
     fun createNotificationChannel() {
@@ -29,15 +32,19 @@ class Noti(val _context: Context)  {
             notificationManager =
                 _context!!.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
             notificationManager!!.createNotificationChannel(channel)
-        }else{
-            Log.e("noti","버전확인!!!")
+        } else {
+            Log.e("noti", "버전확인!!!")
         }
     }
 
-    fun build( notificationId : Int,title: String="게임봇",text:String="게임봇이 활성화중입니다."): Notification {
+    fun build(
+        notificationId: Int,
+        title: String = _context.getString(R.string.accessibility_service_label),
+        text: String = _context.getString(R.string.accessibility_service_description)
+    ): Notification {
 
         val notificationIntent = Intent(_context, MediaProjectionActivity::class.java)
-        notificationIntent.putExtra("action","stop")
+        notificationIntent.putExtra("action", "stop")
 
         val pendingIntent = PendingIntent.getActivity(
             _context,
@@ -50,11 +57,11 @@ class Noti(val _context: Context)  {
         } else {
             Notification.Builder(_context!!)
         }
-            .setSmallIcon(R.mipmap.ic_launcher)
+            .setSmallIcon(R.drawable.ic_stat_name)
             .setContentTitle(title)
             .setContentText(text)
             .setContentIntent(pendingIntent)
-            .addAction(R.mipmap.ic_launcher, "정지", pendingIntent)
+            .addAction(R.drawable.ic_stat_name, "정지", pendingIntent)
             .build()
         return builder
     }
