@@ -1,9 +1,9 @@
 <resources>
-    <string name="app_name">My Application</string>
-    <string name="channel_name">가나다라채널</string>
-    <string name="channel_description">채널설명</string>
-    <string name="accessibility_service_label">게임봇 도우미</string>
-    <string name="accessibility_service_description">게임봇 도우미는 ,,,?</string>
+    <string name="app_name">스톤에이지 하자</string>
+    <string name="channel_name">스톤에이지 하자</string>
+    <string name="channel_description">스톤에이지 하자</string>
+    <string name="accessibility_service_label">스톤에이지 하자</string>
+    <string name="accessibility_service_description">스톤에이지 하자</string>
     <string name="start_txt">시작하기</string>
     <string name="stop_txt">정지시키기</string>
 </resources>
