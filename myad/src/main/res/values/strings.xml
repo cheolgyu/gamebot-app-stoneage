@@ -1,0 +1,9 @@
+<resources>
+    <string name="admob_app_id">ca-app-pub-2187446084708913~5433704281</string>
+    <string name="ad_front">ca-app-pub-2187446084708913/1494459277</string>
+    <string name="ad_front_test">ca-app-pub-3940256099942544/1033173712</string>
+    <string name="ad_banner">ca-app-pub-2187446084708913/7868295934</string>
+    <string name="ad_banner_test">ca-app-pub-3940256099942544/6300978111</string>
+    <string name="ad_reward">ca-app-pub-2187446084708913/5242132593</string>
+    <string name="ad_native">ca-app-pub-2187446084708913/2615969250</string>
+</resources>
