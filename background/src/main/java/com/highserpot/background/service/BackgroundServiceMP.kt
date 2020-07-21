@@ -20,6 +20,7 @@ import android.view.OrientationEventListener
 import android.view.Surface
 import android.view.WindowManager
 import android.widget.Toast
+import com.highserpot.background.R
 
 
 abstract class BackgroundServiceMP : Service() {
@@ -161,21 +162,14 @@ abstract class BackgroundServiceMP : Service() {
         TODO("Not yet implemented")
     }
 
-
     override fun onDestroy() {
         Log.d("", "onDestroy")
         RUN_BACKGROUND = false
-        Toast.makeText(this, "service done onDestroy", Toast.LENGTH_SHORT).show()
-    }
-
-    fun stopForegroundService() {
-        Log.d("", "Stop foreground service.")
-        Toast.makeText(this, "service done stopForegroundService", Toast.LENGTH_SHORT).show()
-        // Stop foreground service and remove the notification.
-        stopForeground(true)
-
-        // Stop the foreground service.
-        stopSelf()
+        Toast.makeText(
+            this,
+            applicationContext.getString(R.string.app_service_stop),
+            Toast.LENGTH_SHORT
+        ).show()
     }
 
 }
