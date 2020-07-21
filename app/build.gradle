@@ -20,7 +20,7 @@ android {
     }
 
     defaultConfig {
-        applicationId "com.example.myapplication"
+        applicationId "com.highserpot.myapplication"
         minSdkVersion 25
         targetSdkVersion 30
         versionCode 1
