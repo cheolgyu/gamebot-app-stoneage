@@ -7,6 +7,7 @@ import android.graphics.Bitmap
 import android.media.Image
 import android.util.Log
 import android.widget.Toast
+import com.highserpot.background.R
 import com.highserpot.background.notification.Noti
 import java.io.File
 import java.io.FileOutputStream
@@ -43,14 +44,18 @@ class BackgroundService : BackgroundServiceMP() {
         mBackgroundThread = BackgroundThread()
         mBackgroundThread!!.start()
 
-        Toast.makeText(this, "service starting~~~~~~~``", Toast.LENGTH_SHORT).show()
+        Toast.makeText(
+            this,
+            applicationContext.getString(R.string.app_service_start),
+            Toast.LENGTH_SHORT
+        ).show()
 
         // If we get killed, after returning from here, restart
         return START_STICKY
     }
 
     //mp 서비스에서 구현
-   @Throws(Exception::class)
+    @Throws(Exception::class)
     fun image_available(): String? {
         Thread.sleep(1000)
         var image = imageReader!!.acquireLatestImage()
@@ -77,10 +82,9 @@ class BackgroundService : BackgroundServiceMP() {
                     "리사이즈---",
                     e.printStackTrace().toString()
                 )
-            }finally {
+            } finally {
                 image.close()
             }
-
 
 
             // write bitmap to a file
