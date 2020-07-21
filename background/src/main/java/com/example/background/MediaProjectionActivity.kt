@@ -13,7 +13,8 @@ import com.example.background.service.BackgroundService
 import kotlinx.android.synthetic.main.activity_mediaprojection.*
 
 open class MediaProjectionActivity : AppCompatActivity() {
-    var msg = "접근성 권한이 필요해요."
+    var msg_n = "접근성 권한이 필요해요."
+    val msg_y = "접근성 권한을 얻었습니다.\n시작하기를 눌러주세요."
     var bg : BackgroundService ?= null
     var mIntent : Intent ?= null
     override fun onResume() {
@@ -21,10 +22,9 @@ open class MediaProjectionActivity : AppCompatActivity() {
         bg = BackgroundService()
         mIntent = Intent(applicationContext, BackgroundService::class.java)
         if (CheckTouch(this).chk()) {
-            msg = "접근성 권한을 얻었습니다."
-            textView2.setText(msg)
+            textView2.setText(msg_y)
         } else {
-            textView2.setText("접근성 권한이 필요해요.")
+            textView2.setText(msg_n)
         }
     }
 
@@ -35,7 +35,8 @@ open class MediaProjectionActivity : AppCompatActivity() {
 
         val action = intent.extras?.getString("action")
         if (action != null && action == "stop") {
-            stopService(mIntent)
+            mIntent = Intent(applicationContext, BackgroundService::class.java)
+            stopService(mIntent!!)
         }
 
     }
@@ -46,16 +47,14 @@ open class MediaProjectionActivity : AppCompatActivity() {
 
     fun service_start_btn(view: View?) {
         if (CheckTouch(this).chk()) {
-            msg = "접근성 권한을 얻었습니다."
-            textView2.setText(msg)
+            textView2.setText(msg_y)
             var mediaProjectionManager =
                 getSystemService(Context.MEDIA_PROJECTION_SERVICE) as MediaProjectionManager
             var captureIntent: Intent = mediaProjectionManager.createScreenCaptureIntent()
             startActivityForResult(captureIntent, 1000)
         } else {
-            msg = "접근성 권한이 필요해요."
-            textView2.setText(msg)
-            Toast.makeText(applicationContext, "접근성 권한이 필요해요.", Toast.LENGTH_SHORT).show()
+            textView2.setText(msg_n)
+            Toast.makeText(applicationContext, msg_n, Toast.LENGTH_SHORT).show()
 
         }
     }

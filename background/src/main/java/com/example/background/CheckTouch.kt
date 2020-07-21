@@ -45,7 +45,8 @@ class CheckTouch(val context: Context) {
     fun setAccessibilityPermissions() {
         val gsDialog: AlertDialog.Builder = AlertDialog.Builder(context)
         gsDialog.setTitle("접근성 권한 설정")
-        gsDialog.setMessage("접근성 권한을 필요로 합니다")
+        gsDialog.setMessage("접근성 권한을 필요로 합니다. " +
+                "\n 확인을 눌러 설정에 가셔서 "+context.getString(R.string.app_name)+" 을 켜주세요.")
         gsDialog.setPositiveButton("확인",
             DialogInterface.OnClickListener { dialog, which ->
                 context.startActivity(Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS))
