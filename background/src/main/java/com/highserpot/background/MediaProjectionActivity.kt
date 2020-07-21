@@ -64,8 +64,6 @@ open class MediaProjectionActivity : AppCompatActivity() {
             mIntent?.putExtra("resultCode",resultCode)
             mIntent?.putExtra("data",data)
             startService(mIntent)
-        } else {
-            Log.e("", "=================else====================")
         }
         super.onActivityResult(requestCode, resultCode, data)
     }

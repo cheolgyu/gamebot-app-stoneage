@@ -1,7 +1,6 @@
 package com.highserpot.background.service
 
 //import com.example.tf.tflite.Run
-import android.content.ContentValues
 import android.content.Intent
 import android.graphics.Bitmap
 import android.media.Image
@@ -29,14 +28,10 @@ class BackgroundService : BackgroundServiceMP() {
 
     @Throws(java.lang.Exception::class)
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        Log.e(
-            TAG,
-            "--------------BackgroundService --------onStartCommand---------RUN_BACKGROUND=$RUN_BACKGROUND,action=$my_action"
-        )
+
         RUN_BACKGROUND = true
         my_resultCode = intent!!.getIntExtra("resultCode", 1000)
         my_data = intent.getParcelableExtra("data")
-
 
         createVirtualDisplay()
 
@@ -79,7 +74,7 @@ class BackgroundService : BackgroundServiceMP() {
                 bitmap.copyPixelsFromBuffer(buffer)
             } catch (e: Exception) {
                 Log.e(
-                    "리사이즈---",
+                    "---",
                     e.printStackTrace().toString()
                 )
             } finally {
@@ -94,13 +89,8 @@ class BackgroundService : BackgroundServiceMP() {
             var my_file = STORE_DIRECTORY + file_id + ".JPEG"
             fos =
                 FileOutputStream(my_file)
-            Log.d("리사이즈---bitmap-정보", bitmap?.width.toString() + "," + bitmap?.height.toString())
             bitmap!!.compress(Bitmap.CompressFormat.JPEG, 100, fos)
             fos.close()
-            Log.e(
-                ContentValues.TAG,
-                "captured image: " + my_file
-            )
 
             return my_file
 
@@ -126,19 +116,11 @@ class BackgroundService : BackgroundServiceMP() {
         noti.createNotificationChannel()
         var notify = noti.build(11232131)
         startForeground(FOREGROUND_SERVICE_ID, notify)
-        Log.e(
-            TAG,
-            "--------------BackgroundService --------my_notify----------------------RUN_BACKGROUND=" + RUN_BACKGROUND
-        )
+
     }
 
     fun ready_media() {
         mkdir()
-        //startActivity(com.example.background.MediaProjectionActivity.newInstance(applicationContext))
-        Log.e(
-            TAG,
-            "--------------BackgroundService --------my_media----------------------RUN_BACKGROUND=" + RUN_BACKGROUND
-        )
     }
 
     fun mkdir() {
@@ -175,10 +157,6 @@ class BackgroundService : BackgroundServiceMP() {
             while (RUN_BACKGROUND) {
                 Thread.sleep(1000)
 
-                Log.e(
-                    "쓰레드",
-                    "-------------------mWidth=$mWidth--mHeight=$mHeight-----------------------"
-                )
                 var full_path = image_available()
 
                 if (full_path != null && full_path != "") {
@@ -186,22 +164,13 @@ class BackgroundService : BackgroundServiceMP() {
                     if (arr != null) {
                         var x = arr.get(0)
                         var y = arr.get(1)
-                        Log.e(
-                            "쓰레드",
-                            "--------------$x---$y---------------------------"
-                        )
+
                         touchService!!.click(x, y)
                     } else {
-                        Log.e(
-                            "쓰레드",
-                            "tflite_run return null "
-                        )
+
                     }
                 } else {
-                    Log.d(
-                        "쓰레드",
-                        "image_available null "
-                    )
+
                 }
             }
         }

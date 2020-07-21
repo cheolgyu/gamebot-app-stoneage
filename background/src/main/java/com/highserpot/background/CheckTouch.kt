@@ -5,7 +5,6 @@ import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
 import android.provider.Settings
-import android.util.Log
 import android.view.accessibility.AccessibilityManager
 
 
@@ -16,10 +15,8 @@ class CheckTouch(val context: Context) {
 
     fun chk(): Boolean {
         if (!checkAccessibilityPermissions()) {
-            Log.d("333333333", "222222222")
             setAccessibilityPermissions()
         } else {
-            Log.d("333333333", "------------")
             return true
         }
         return false
