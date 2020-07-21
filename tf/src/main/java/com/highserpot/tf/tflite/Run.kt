@@ -3,7 +3,6 @@ package com.highserpot.tf.tflite
 import android.content.Context
 import android.content.res.AssetManager
 import android.graphics.*
-import android.util.Log
 import com.highserpot.tf.env.ImageUtils
 import com.highserpot.tf.tflite.Classifier.Recognition
 import com.highserpot.tf.tracking.MultiBoxTracker
@@ -106,7 +105,7 @@ class Run(val context: Context, val rotation: Int) {
 
     // @Throws(java.lang.Exception::class)
     fun get_xy(fullPath: String): FloatArray? {
-        val save_result = true
+        val save_result = false
         val canvas = Canvas(croppedBitmap!!)
         val ori_canvas = Canvas(oriBitmap!!)
 
@@ -134,7 +133,6 @@ class Run(val context: Context, val rotation: Int) {
             100,
             FileOutputStream(File(chk_file_str2))
         );
-        Log.e("모델결과", "파일저장: $chk_file_str2")
 
         val results: List<Classifier.Recognition?>? = detector!!.recognizeImage(croppedBitmap)
 
@@ -147,7 +145,6 @@ class Run(val context: Context, val rotation: Int) {
         paint.strokeWidth = 2.0f
         ++timestamp
         val currTimestamp: Long = timestamp
-        Log.d("run--", fullPath)
         if (results!!.isNotEmpty()) {
             // Log.d("예측결과- results ",results.toString())
             if (save_result) {
@@ -160,26 +157,18 @@ class Run(val context: Context, val rotation: Int) {
                 for (result2 in results) {
                     val result: Recognition = result2!!
                     val location = result!!.getLocation()
-                    //Log.d("예측결과- all ",result.getConfidence_int().toString()+"% -"+result.getTitle()+"-"+result.getLocation())
-                    val test = result.getConfidence()!! >= minimumConfidence
+
                     if (location != null ) {
-                        Log.d("run-예측결과- location 111--", result.getTitle()+"-"+result.getConfidence()+"-" + location.toString())
                         val ori_result  = result
                         result.setLocation(location)
                         mappedRecognitions.add(result)
                         canvas.drawRect(location, paint)
 
-                        // 이게 다시 원래로 좌표로 인식크기 변환하는거니깐 일단 주석
                         val bbox = RectF()
                         frameToCanvasMatrix!!.mapRect(bbox, location)
                         ori_result.setLocation(bbox)
                         ori_mappedRecognitions.add(ori_result)
                         ori_canvas.drawRect(bbox, paint)
-
-                        Log.d("run-예측결과- location 222---", "" + location.toString())
-                        Log.d("run-예측결과- bbox ", "" + bbox.toString())
-
-
                     }
                 }
 
@@ -195,7 +184,6 @@ class Run(val context: Context, val rotation: Int) {
                     100,
                     FileOutputStream(File(full_arr[0] + "__cropped.JPEG"))
                 );
-                Log.e("모델결과", "파일저장-확대에  그린것: " + full_arr[0] + "_cropped.JPEG")
 
                 ori_tracker!!.trackResults(ori_mappedRecognitions, currTimestamp)
                 ori_tracker!!.draw(ori_canvas)
@@ -205,7 +193,6 @@ class Run(val context: Context, val rotation: Int) {
                     100,
                     FileOutputStream(File(full_arr[0] + "_ori.JPEG"))
                 );
-                Log.e("모델결과", "파일저장-원본에 그린것: " + full_arr[0] + "_ori.JPEG")
 
             }
             var max_item = results[0]
@@ -216,8 +203,6 @@ class Run(val context: Context, val rotation: Int) {
             } else {
                 val bbox = RectF()
                 frameToCanvasMatrix!!.mapRect(bbox, location)
-                Log.d("모델결과- location ", "" + location.toString())
-                Log.d("모델결과- bbox     ", "" + bbox.toString())
                 var item = if(save_result) location else  bbox
 
                 var x = item.left + (item.right - item.left) / 2
@@ -226,8 +211,6 @@ class Run(val context: Context, val rotation: Int) {
                     f_arr.set(0, x)
                     f_arr.set(1, y)
 
-                    Log.d("run-모델결과-x,y ", x.toString())
-                    Log.d("run-모델결과-x,y ", y.toString())
                     if (x < 0 || y < 0) {
                         return null
                     }

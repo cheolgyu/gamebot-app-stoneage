@@ -163,7 +163,6 @@ abstract class BackgroundServiceMP : Service() {
     }
 
     override fun onDestroy() {
-        Log.d("", "onDestroy")
         RUN_BACKGROUND = false
         Toast.makeText(
             this,
