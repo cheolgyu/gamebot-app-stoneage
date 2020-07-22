@@ -22,7 +22,7 @@ open class IntentFragment : Fragment() {
         val v: View = inflater.inflate(R.layout.intent_fragment, container, false)
         MobileAds.initialize(context) {}
         mInterstitialAd = InterstitialAd(context)
-        mInterstitialAd.adUnitId = getString(R.string.ad_front_test)// R.string.ad_front_test.toString()
+        mInterstitialAd.adUnitId = getString(R.string.ad_front)
         mInterstitialAd.adListener = object : AdListener() {
             override fun onAdLoaded() {
                 Log.d("TAGHSS", "onAdLoaded")
