@@ -1,5 +1,5 @@
-include ':myad'
 include ':background'
+include ':myad'
 include ':tf'
 include ':app'
-rootProject.name = "My Application"
+rootProject.name = "gamebot-app-stoneage"
