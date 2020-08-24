@@ -1,5 +1,5 @@
-include ':background'
-include ':myad'
-include ':tf'
+include ':gamebot-common-tflite'
+include ':gamebot-common-background'
+include ':gamebot-common-admob'
 include ':app'
 rootProject.name = "gamebot-app-stoneage"
