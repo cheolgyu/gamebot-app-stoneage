@@ -31,8 +31,8 @@ android {
         applicationId "com.highserpot.myapplication"
         minSdkVersion 25
         targetSdkVersion 30
-        versionCode 15
-        versionName "1.0.14"
+        versionCode 17
+        versionName "1.0.16"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
