@@ -1,3 +1,11 @@
 <resources>
 
+    <string name="label_1">스킵</string>
+    <string name="label_2">스킵 아이콘</string>
+    <string name="label_3">수령가능</string>
+    <string name="label_4">수령</string>
+    <string name="label_5">이름 5</string>
+    <string name="label_6">전투시작</string>
+    <string name="label_7">도전</string>
+    <string name="label_8">이름 8</string>
 </resources>
